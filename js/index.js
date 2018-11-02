@@ -19,7 +19,7 @@ hideAllTabs = function () {
 	let target = wmpDisplay.getElementsByTagName("iframe");
 	while (count < target.length) {
 		target[count].style.display = "none";
-		count ++;
+		count++;
 	};
 	wmpPlayerCore.style.display = "";
 	wmpPlayerCore.style.filter = "blur(2px)";
@@ -37,7 +37,7 @@ document.onreadystatechange = function () {
 		wmpResizeWindow();
 		// Receive data
 		addEventListener("message", function (ev) {
-			if (ev.data.type == "playerCore") {
+			if (ev.data.type == "info:player-core") {
 				coreData = ev.data;
 				document.title = coreData.title;
 			}
@@ -49,15 +49,31 @@ document.onreadystatechange = function () {
 				let count = 0;
 				while (count < wmpMenuBar.btnList.length) {
 					wmpMenuBar.btnList[count].className = "tab-item";
-					count ++;
+					count++;
 				};
 				this.className = "tab-item-active";
 			});
-			wmpMenuBarCount ++;
+			wmpMenuBarCount++;
 		}
 		wmpMenuBar.btnList[0].addEventListener("mouseup", function () {
 			hideAllTabs();
 			document.getElementById("start-tab").style.display = "";
+		});
+		wmpMenuBar.btnList[2].addEventListener("mouseup", function () {
+			hideAllTabs();
+			document.getElementById("playlist-tab").style.display = "";
+		});
+		wmpMenuBar.btnList[3].addEventListener("mouseup", function () {
+			hideAllTabs();
+			document.getElementById("history-tab").style.display = "";
+		});
+		wmpMenuBar.btnList[4].addEventListener("mouseup", function () {
+			hideAllTabs();
+			document.getElementById("search-tab").style.display = "";
+		});
+		wmpMenuBar.btnList[5].addEventListener("mouseup", function () {
+			hideAllTabs();
+			document.getElementById("settings-tab").style.display = "";
 		});
 		wmpMenuBar.btnList[wmpMenuBar.btnList.length - 1].addEventListener("mouseup", function () {
 			hideAllTabs();
@@ -82,5 +98,9 @@ document.onreadystatechange = function () {
 			}
 			wmpPlayerCore.src = wmpPlayerCorePath;
 		}
+		// Disable all menu queries
+		document.oncontextmenu = () => {
+			return false;
+		};
 	}
 }
