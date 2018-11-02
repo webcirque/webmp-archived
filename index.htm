@@ -2,8 +2,8 @@
 <head>
 	<title>WebMP 0.28</title>
 	<script src="libs/elsl.pre1.js"></script>
-	<link rel="stylesheet" href="index.css"></link>
-	<script src="index.js"></script>
+	<link rel="stylesheet" href="css/index.css"></link>
+	<script src="js/index.js"></script>
 	<link href="img/icon.png" rel="shortcut icon"/>
 </head>
 <body>
@@ -15,12 +15,28 @@
 			<img src="img/play.png" id="icon-player"></img>
 		</div>
 		<div class="tab-item">
+			<img src="img/playlistBig.png" id="icon-playlist"></img>
+		</div>
+		<div class="tab-item">
+			<img src="img/history.svg" id="icon-history"></img>
+		</div>
+		<div class="tab-item">
+			<img src="img/search.png" id="icon-search"></img>
+		</div>
+		<div class="tab-item">
+			<img src="img/settings.png" id="icon-settings"></img>
+		</div>
+		<div class="tab-item">
 			<img src="img/info.png" id="icon-info"></img>
 		</div>
 	</div>
 	<div id="display">
-		<iframe id="player-core" src="core.htm"></iframe>
+		<iframe id="player-core" src="core.htm" tabindex="-1" autofocus></iframe>
 		<iframe id="start-tab" src="start.htm" style="display: none"></iframe>
+		<iframe id="playlist-tab" src="playlist.htm" style="display: none"></iframe>
+		<iframe id="history-tab" src="history.htm" style="display: none"></iframe>
+		<iframe id="search-tab" src="search.htm" style="display: none"></iframe>
+		<iframe id="settings-tab" src="settings.htm" style="display: none"></iframe>
 		<iframe id="info-tab" src="info.htm" style="display: none"></iframe>
 	</div>
 </body>
