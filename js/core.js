@@ -1,4 +1,4 @@
-// Thread
+﻿// Thread
 function refresherThreadFunc() {
 	// Save playback info
 	if (video.readyState == 4) {
@@ -192,17 +192,19 @@ document.onreadystatechange = function() {
 		console.log("WebMP started loading...");
 		// Load APIs
 		if (window.navigator) {
-			navigator.getBattery().then(function(value) {
-				batteryAPI = value;
-				batteryAPI.onlevelchange = function() {
-					if (!(this.notified)) {
-						if (batteryAPI.level <= 0.2) {
-							notify.push("sound/lowBattery.aac");
-							gui.status.push(lang.lowBattery)
+			if (navigator.getBattery) {
+				navigator.getBattery().then(function(value) {
+					batteryAPI = value;
+					batteryAPI.onlevelchange = function() {
+						if (!(this.notified)) {
+							if (batteryAPI.level <= 0.2) {
+								notify.push("sound/lowBattery.aac");
+								gui.status.push(lang.lowBattery)
+							}
 						}
 					}
-				}
-			});
+				});
+			}
 		}
 		// Load elements
 		document.body.tabIndex = "-1";
