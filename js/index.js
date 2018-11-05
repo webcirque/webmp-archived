@@ -83,7 +83,8 @@ document.onreadystatechange = function () {
 			hideAllTabs();
 			wmpPlayerCore.style.filter = "";
 		});
-		// Pass parameters to core
+		// Pass information to core
+		// Pass search queries
 		if (window.TabSearch) {
 			let wmpPassParam = TabSearch(location.search);
 			let wmpPlayerCorePath = "core.htm?";
@@ -98,6 +99,33 @@ document.onreadystatechange = function () {
 			}
 			wmpPlayerCore.src = wmpPlayerCorePath;
 		}
+		// Pass file info
+		document.body.addEventListener("dragenter", function (e) {
+			wmpPlayerCore.style.display = "none";
+			e.preventDefault();
+			e.stopPropagation();
+		}, true);
+		document.body.addEventListener("dragover", function (e) {
+			e.preventDefault();
+			e.stopPropagation();
+		}, true);
+		document.body.addEventListener("dragleave", function (e) {
+			wmpPlayerCore.style.display = "";
+			e.preventDefault();
+			e.stopPropagation();
+		}, true);
+		document.body.addEventListener("drop", function (e) {
+			wmpPlayerCore.style.display = "";
+			e.preventDefault();
+			e.stopPropagation();
+			let count = 0;
+			let df = e.dataTransfer;
+			wmpPlayerCore.contentWindow.postMessage({
+				"type": "info:gui",
+				"specify": "playMedia",
+				"data": df.files
+			}, "*");
+		}, true);
 		// Disable all menu queries
 		document.oncontextmenu = () => {
 			return false;

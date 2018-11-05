@@ -1,4 +1,12 @@
-﻿// Thread
+﻿// Message
+addEventListener("message", function(e) {
+	if (e.data.type == "info:gui") {
+		if (e.data.specify == "playMedia") {
+			loadBlobMedia(e.data.data);
+		}
+	}
+});
+// Thread
 function refresherThreadFunc() {
 	// Save playback info
 	if (video.readyState == 4) {
@@ -63,7 +71,7 @@ function refresherThreadFunc() {
 	// Show FPS
 	fps.last = fps.curr;
 	fps.curr = new Date();
-	fps.innerHTML = (Math.round(1000 / (timeSt(fps.curr) - timeSt(fps.last)))).toString() + "FPS " + fps.curr.toLocaleDateString();
+	fps.innerHTML = (Math.round(1000 / (timeSt(fps.curr) - timeSt(fps.last)))).toString() + "FPS";
 	let timeArr = [fps.curr.getHours().toString(), fps.curr.getMinutes().toString(), fps.curr.getSeconds().toString()];
 	for (let countA = 0; countA < timeArr.length; countA++) {
 		if (timeArr[countA].length < 2) {
@@ -94,7 +102,7 @@ function refresherThreadFunc() {
 	// Timebar
 	gui.timeBar.style.width = (innerWidth - 72) + "px";
 	gui.timeP.style.width = Math.floor(video.currentTime / video.duration * (innerWidth - 70)) + "px";
-	let vcs = video.src.split("/");
+	vcs = video.src.split("/");
 	if (info.file) {
 		if (video.readyState == 4) {
 			gui.title.innerHTML = decodeURI(vcs[vcs.length - 1]);
@@ -110,6 +118,23 @@ function refresherThreadFunc() {
 		}
 		else {
 			gui.title.innerHTML = decodeURI(vcs[vcs.length - 1]) + " - " + lang.videoDecoding;
+			gui.loadAni.style.display = "";
+		}
+	} else if (window.blobMedia) {
+		if (video.readyState == 4) {
+			gui.title.innerHTML = blobMedia.name;
+			gui.loadAni.style.display = "none";
+		}
+		else if (video.readyState == 3) {
+			gui.title.innerHTML = blobMedia.name + " - " + lang.videoCanNextFrame;
+			gui.loadAni.style.display = "";
+		}
+		else if (video.readyState == 0) {
+			gui.title.innerHTML = blobMedia.name + " - " + lang.noData;
+			gui.loadAni.style.display = "none";
+		}
+		else {
+			gui.title.innerHTML = blobMedia.name + " - " + lang.videoDecoding;
 			gui.loadAni.style.display = "";
 		}
 	}
@@ -498,6 +523,26 @@ document.onreadystatechange = function() {
 		document.oncontextmenu = function() {
 			return false;
 		}
+		// Dragging
+		document.body.addEventListener("dragenter", function (e) {
+			e.preventDefault();
+			e.stopPropagation();
+		}, true);
+		document.body.addEventListener("dragover", function (e) {
+			e.preventDefault();
+			e.stopPropagation();
+		}, true);
+		document.body.addEventListener("dragleave", function (e) {
+			e.preventDefault();
+			e.stopPropagation();
+		}, true);
+		document.body.addEventListener("drop", function (e) {
+			e.preventDefault();
+			e.stopPropagation();
+			let count = 0;
+			let df = e.dataTransfer;
+			loadBlobMedia(df.files);
+		}, true);
 	}
 }
 // Volume public method
@@ -578,6 +623,42 @@ timeSt = function(time) {
 			timestamp += 86400000;
 		}
 		return timestamp;
+	}
+}
+// Load Blob Media
+function loadBlobMedia(files) {
+	video.pause();
+	audio.pause();
+	let count = 0;
+	while (count <files.length) {
+		console.info(files[count]);
+		if (files[count].type.indexOf("video") == 0 || files[count].type.indexOf("audio") == 0) {
+			blobMedia = files[count];
+			blobURL = URL.createObjectURL(blobMedia);
+			vcs = [blobMedia.name];
+			video.src = blobURL;
+			audio.src = blobURL;
+		} else if (files[count].type == "") {
+			let fileName = files[count].name;
+			switch (fileName.split(".")[fileName.split(".").length - 1].toLowerCase()) {
+				case "srt": {
+					let fileRead = new FileReader();
+					fileRead.onloadend = function () {
+						if (this.error) {
+							notify.push("sound/error.aac");
+							gui.status.push(lang.subReadError);
+						}
+						else {
+							subt = new Subtitles(this.result);
+							subt.import.srt();
+							console.log(subt);
+						}
+					};
+					fileRead.readAsText(files[count]);
+				}
+			}
+		}
+		count ++;
 	}
 }
 // Language
