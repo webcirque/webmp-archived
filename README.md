@@ -1,2 +1,2 @@
-# Webcirque WebMP
-Might be the best Web player on the web
+# webmp
+Webcirque Web Media Player
