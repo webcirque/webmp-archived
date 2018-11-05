@@ -11,6 +11,10 @@
 	font-style: normal;
 }
 
+#title {
+	word-break: break-all;
+}
+
 body {
 	background-color: black;
 	color: white;
@@ -31,7 +35,8 @@ input[type=file] {
 div, video, img {
 	position: absolute;
 	margin: 0;
-	cursor: default
+	cursor: default,
+	font-size: 14px;
 }
 
 #topbar, #bottom {
@@ -203,6 +208,6 @@ progress {
 }
 
 #time {
-	top: 2px;
-	right: 144px;
+	top: 0;
+	left: 64px;
 }
