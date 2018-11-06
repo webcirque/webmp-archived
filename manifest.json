@@ -12,8 +12,10 @@
 	},
 	"browser_action": {
 		"default_icon": "img/icon64.png",
-		"default_title": "WebMP 0.28",
-		"default_popup": "popup.htm"
+		"default_title": "WebMP 0.28"
 	},
-	"homepage_url": "https://pwcq.ml/"
+	"homepage_url": "https://pwcq.ml/",
+	"permissions": [
+		"cookies", "geolocation", "notifications", "storage", "unlimitedStorage", "http://*/*", "https://*/*"
+	]
 }
