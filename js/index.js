@@ -122,7 +122,7 @@ document.onreadystatechange = function () {
 			let df = e.dataTransfer;
 			wmpPlayerCore.contentWindow.postMessage({
 				"type": "info:gui",
-				"specify": "playMedia",
+				"specify": "playBlobMedia",
 				"data": df.files
 			}, "*");
 		}, true);

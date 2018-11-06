@@ -1,8 +1,14 @@
 ﻿// Message
 addEventListener("message", function(e) {
 	if (e.data.type == "info:gui") {
-		if (e.data.specify == "playMedia") {
-			loadBlobMedia(e.data.data);
+		switch (e.data.specify) {
+			case "playBlobMedia": {
+				loadBlobMedia(e.data.data);
+				break;
+			};
+			case "playURLMedia": {
+				loadURLMedia(e.data.data);
+			}
 		}
 	}
 });
@@ -33,14 +39,15 @@ function refresherThreadFunc() {
 			if (window.subt) {
 				subList = subt.currentSub(audio.currentTime);
 				let scnt = 0;
-				gui.subtitle.innerHTML = "";
+				let subContent = "";
 				while (scnt < subList.length) {
 					while (subList[scnt].text.search("\n") != -1) {
 						subList[scnt].text = subList[scnt].text.replace("\n", "<br/>");
 					}
-					gui.subtitle.innerHTML += subList[scnt].text + "<br/>";
+					subContent += "<span>" + subList[scnt].text + "</span><br/>";
 					scnt ++;
 				}
+				gui.subtitle.innerHTML = subContent;
 				let subSize = Math.round((innerWidth * innerHeight) / 921600 * 24 * 2) / 2;
 				if (subSize < 12) {
 					subSize = 12;
@@ -58,7 +65,7 @@ function refresherThreadFunc() {
 	while (currentSec.length < 2) {
 		currentSec = "0" + currentSec;
 	}
-	gui.timeNow.innerHTML = currentMin + ":" + currentSec + "&#32;&#32;-";
+	gui.timeNow.innerHTML = "&#32;&#32;&lt;--" + currentMin + ":" + currentSec;
 	currentMin = Math.floor(video.duration / 60).toString();
 	while (currentMin.length < 2) {
 		currentMin = "0" + currentMin;
@@ -67,7 +74,7 @@ function refresherThreadFunc() {
 	while (currentSec.length < 2) {
 		currentSec = "0" + currentSec;
 	}
-	gui.timeAll.innerHTML = "+&#32;&#32;" + currentMin + ":" + currentSec;
+	gui.timeAll.innerHTML = currentMin + ":" + currentSec + "--&gt;&#32;&#32;";
 	// Show FPS
 	fps.last = fps.curr;
 	fps.curr = new Date();
@@ -262,6 +269,8 @@ document.onreadystatechange = function() {
 		gui.sub = document.getElementById("sub");
 		gui.subtitle = document.getElementById("subtitle");
 		gui.time = document.getElementById("time");
+		// Force zero volume
+		video.muted = true;
 		// Load
 		video.addEventListener("readystatechange", function() {
 			if (this.readyState == 4) {
@@ -633,6 +642,11 @@ function loadBlobMedia(files) {
 	while (count <files.length) {
 		console.info(files[count]);
 		if (files[count].type.indexOf("video") == 0 || files[count].type.indexOf("audio") == 0) {
+			if (window.blobURL) {
+				// Clear previous blob
+				URL.revokeObjectURL(blobURL);
+				window.blobURL = undefined;
+			}
 			blobMedia = files[count];
 			blobURL = URL.createObjectURL(blobMedia);
 			vcs = [blobMedia.name];
@@ -655,11 +669,41 @@ function loadBlobMedia(files) {
 						}
 					};
 					fileRead.readAsText(files[count]);
+					break;
 				}
 			}
 		}
 		count ++;
 	}
+}
+// Load URL Media
+function loadURLMedia(url, name = lang.defaultTitle) {
+	if (window.blobURL) {
+		// Clear previous blob
+		URL.revokeObjectURL(blobURL);
+		window.blobURL = undefined;
+		window.blobMedia = undefined;
+	}
+	URLMediaRequest = new XMLHttpRequest();
+	URLMediaRequest.responseType = "blob";
+	URLMediaRequest.open("GET", url, true);
+	URLMediaRequest.already = false;
+	URLMediaRequest.onreadystatechange = function () {
+		if (this.readyState == 4) {
+			if (window.blobURL) {
+				// Clear previous blob
+				URL.revokeObjectURL(blobURL);
+				window.blobURL = undefined;
+				window.blobMedia = undefined;
+			}
+			blobMedia = this.response;
+			blobMedia.name = name;
+			blobURL = URL.createObjectURL(blobMedia);
+			video.src = blobURL;
+			audio.src = blobURL;
+		}
+	}
+	URLMediaRequest.send();
 }
 // Language
 if (window.navigator) {
@@ -685,7 +729,8 @@ if (window.navigator) {
 					"lowBattery": "电池电量过低！",
 					"noSub": " (无字幕)",
 					"loadedCore": "已经作为核心加载",
-					"loadedSub": "(字幕已加载)"
+					"loadedSub": "(字幕已加载)",
+					"defaultTitle": "无标题媒体"
 				}
 				break;
 			case "zh-tw":
@@ -708,7 +753,8 @@ if (window.navigator) {
 					"lowBattery": "電池電量太低啦！",
 					"noSub": " (無字幕)",
 					"loadedCore": "已經作為核心裝載",
-					"loadedSub": "(字幕已裝載)"
+					"loadedSub": "(字幕已裝載)",
+					"defaultTitle": "無標題檔案"
 				}
 			default:
 				console.log("Language: English");
@@ -728,7 +774,8 @@ if (window.navigator) {
 					"lowBattery": "Battery too low!",
 					"noSub": " (No Subtitles)",
 					"loadedCore": "Loaded as core",
-					"loadedSub": "(CC)"
+					"loadedSub": "(CC)",
+					"defaultTitle": "Unknown media"
 				}
 		}
 	}
