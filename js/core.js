@@ -111,6 +111,7 @@ function refresherThreadFunc() {
 	gui.timeP.style.width = Math.floor(video.currentTime / video.duration * (innerWidth - 70)) + "px";
 	vcs = video.src.split("/");
 	if (info.file) {
+		mediaMode = "S";
 		if (video.readyState == 4) {
 			gui.title.innerHTML = decodeURI(vcs[vcs.length - 1]);
 			gui.loadAni.style.display = "none";
@@ -128,6 +129,7 @@ function refresherThreadFunc() {
 			gui.loadAni.style.display = "";
 		}
 	} else if (window.blobMedia) {
+		mediaMode = "B";
 		if (video.readyState == 4) {
 			gui.title.innerHTML = blobMedia.name;
 			gui.loadAni.style.display = "none";
@@ -205,7 +207,7 @@ function refresherThreadFunc() {
 	if (window.batteryAPI) {
 		if (batteryAPI.charging) {
 			battery.style.color = "#0f0";
-			battery.innerHTML = Math.round(batteryAPI.level * 100).toString() + "% " + lang.charging;
+			battery.innerHTML = "<span style=\"color:#fff;\">[" + mediaMode + "] </span>" + Math.round(batteryAPI.level * 100).toString() + "% " + lang.charging;
 		}
 		else {
 			if (batteryAPI.level >= 0.5) {
@@ -214,7 +216,7 @@ function refresherThreadFunc() {
 			else {
 				battery.style.color = "rgb(255," + ((batteryAPI.level) * 510).toString() + ",0)";
 			}
-			battery.innerHTML = Math.round(batteryAPI.level * 100).toString() + "% " + lang.discharging;
+			battery.innerHTML = "<span style=\"color:#fff;\">[" + mediaMode + "] </span>" + Math.round(batteryAPI.level * 100).toString() + "% " + lang.discharging;
 		}
 	}
 }
@@ -269,6 +271,9 @@ document.onreadystatechange = function() {
 		gui.sub = document.getElementById("sub");
 		gui.subtitle = document.getElementById("subtitle");
 		gui.time = document.getElementById("time");
+		volumeBtnDown = document.getElementById("volume-btn-minus");
+		volumeBtnUp = document.getElementById("volume-btn-plus");
+		mediaMode = "S";
 		// Force zero volume
 		video.muted = true;
 		// Load
@@ -334,6 +339,13 @@ document.onreadystatechange = function() {
 				gui.volume.panel.style.display = "none";
 			}
 		}
+		gui.volume.show.onmousedown = function () {
+			shift = 0;
+		}
+		gui.speed.onclick = gui.volume.show.onclick;
+		gui.speed.onmousedown = function () {
+			shift = 2;
+		};
 		// Click to seek
 		gui.timeNow.onclick = function() {
 			if (video.currentTime >= 10) {
@@ -510,7 +522,7 @@ document.onreadystatechange = function() {
 					break;
 				case 38:
 					// Up arrow
-					document.getElementById("volume-btn-plus").click();
+					volume(2 + shift);
 					break;
 				case 39:
 					// Right arrow
@@ -518,7 +530,7 @@ document.onreadystatechange = function() {
 					break;
 				case 40:
 					// Down arrow
-					document.getElementById("volume-btn-minus").click();
+					volume(1 + shift);
 					break;
 				case 79:
 					// O key
@@ -557,7 +569,7 @@ document.onreadystatechange = function() {
 // Volume public method
 function volume(action) {
 	if (action == 2) {
-		if (audio.volume < 0.9) {
+		if (audio.volume < 0.99) {
 			audio.volume = (parseInt(gui.volume.show.innerHTML) + 1) / 100;
 		}
 		else {
@@ -565,7 +577,7 @@ function volume(action) {
 		}
 	}
 	else if (action == 1) {
-		if (audio.volume > 0.1) {
+		if (audio.volume > 0.01) {
 			audio.volume = (parseInt(gui.volume.show.innerHTML) - 1) / 100;
 		}
 		else {
@@ -638,6 +650,7 @@ timeSt = function(time) {
 function loadBlobMedia(files) {
 	video.pause();
 	audio.pause();
+	info.file = null;
 	let count = 0;
 	while (count <files.length) {
 		console.info(files[count]);
@@ -684,6 +697,7 @@ function loadURLMedia(url, name = lang.defaultTitle) {
 		window.blobURL = undefined;
 		window.blobMedia = undefined;
 	}
+	info.file = null;
 	URLMediaRequest = new XMLHttpRequest();
 	URLMediaRequest.responseType = "blob";
 	URLMediaRequest.open("GET", url, true);
@@ -697,13 +711,49 @@ function loadURLMedia(url, name = lang.defaultTitle) {
 				window.blobMedia = undefined;
 			}
 			blobMedia = this.response;
-			blobMedia.name = name;
-			blobURL = URL.createObjectURL(blobMedia);
-			video.src = blobURL;
-			audio.src = blobURL;
+			if (blobMedia != null) {
+				mediaMode = "B";
+				blobMedia.name = name;
+				blobURL = URL.createObjectURL(blobMedia);
+				video.src = blobURL;
+				audio.src = blobURL;
+			};
 		}
+	};
+	URLMediaRequest.onprogress = function () {
+		if (window.blobURL) {
+			// Clear previous blob
+			URL.revokeObjectURL(blobURL);
+			window.blobURL = undefined;
+			window.blobMedia = undefined;
+		}
+		blobMedia = new Blob();
+		blobMedia.name = lang.loadingBlob;
+		blobURL = URL.createObjectURL(blobMedia);
+		mediaMode = "B";
+		video.src = blobURL;
+		audio.src = blobURL;
 	}
+	URLMediaRequest.onerror = function () {
+		video.src = url;
+		audio.src = url;
+		info.file = url;
+		mediaMode = "S";
+		vcs = url.split("/");
+	};
 	URLMediaRequest.send();
+}
+// Audio
+analyzeAudio = function (blobObj) {
+	audio.context = new AudioContext();
+	audioFileR = new FileReader();
+	audioFileR.onloadend = function () {
+		audio.context.decodeAudioData(this.result);
+		audio.analyser = audio.context.createAnalyser();
+		audio.analyser.fftSize = 1024;
+		audio.bfd = audio.analyser.getByteFrequencyData(new Uint8Array(audio.analyser.frequencyBinCount));
+	};
+	audioFileR.readAsArrayBuffer(blobMedia);
 }
 // Language
 if (window.navigator) {
@@ -730,7 +780,8 @@ if (window.navigator) {
 					"noSub": " (无字幕)",
 					"loadedCore": "已经作为核心加载",
 					"loadedSub": "(字幕已加载)",
-					"defaultTitle": "无标题媒体"
+					"defaultTitle": "无标题媒体",
+					"loadingBlob": "获取网络资源中"
 				}
 				break;
 			case "zh-tw":
@@ -754,7 +805,8 @@ if (window.navigator) {
 					"noSub": " (無字幕)",
 					"loadedCore": "已經作為核心裝載",
 					"loadedSub": "(字幕已裝載)",
-					"defaultTitle": "無標題檔案"
+					"defaultTitle": "無標題檔案",
+					"loadingBlob": "獲取網路檔案中"
 				}
 			default:
 				console.log("Language: English");
@@ -775,7 +827,8 @@ if (window.navigator) {
 					"noSub": " (No Subtitles)",
 					"loadedCore": "Loaded as core",
 					"loadedSub": "(CC)",
-					"defaultTitle": "Unknown media"
+					"defaultTitle": "Unknown media",
+					"loadingBlob": "Fetching online content"
 				}
 		}
 	}
