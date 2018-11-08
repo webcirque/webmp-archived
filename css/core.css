@@ -36,11 +36,18 @@ input[type=file] {
 	height: 100%
 }
 
-div, video, img {
+div, video, img, canvas {
 	position: absolute;
 	margin: 0;
 	cursor: default;
 	font-size: 16px;
+}
+
+#audio-visualizer {
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
 }
 
 #topbar, #bottom {
