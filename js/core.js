@@ -234,7 +234,7 @@ function refresherThreadFunc() {
 					let y = 0;
 					for (let c = 0; c < bufferLength; c ++) {
 						y = (new Uint8Array(bufferLength))[c] * gui.canvas.height / 256 - 1;
-						gui.ctx.moveTo(x, (gui.canvas.height+ y) / 2;
+						gui.ctx.moveTo(x, (gui.canvas.height+ y) / 2);
 						gui.ctx.lineTo(x, gui.canvas.height / 2);
 						gui.ctx.stroke();
 						x += gui.canvas.width / bufferLength;
