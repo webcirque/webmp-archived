@@ -219,6 +219,31 @@ function refresherThreadFunc() {
 			battery.innerHTML = "<span style=\"color:#fff;\">[" + mediaMode + "] </span>" + Math.round(batteryAPI.level * 100).toString() + "% " + lang.discharging;
 		}
 	}
+	// Audio Visualizer
+	if (gui.canvas) {
+		gui.canvas.width = gui.canvas.clientWidth;
+		gui.canvas.height = gui.canvas.clientHeight;
+		gui.ctx = gui.canvas.getContext("2d");
+		let x = 0;
+		if (audio.context) {
+			switch (visualizerMode) {
+				case "oscillo": {
+					gui.ctx.fillStyle = "#fff";
+					gui.ctx.strokeStyle = "#ff0";
+					let bufferLength = audio.analyser.frequencyBinCount;
+					let y = 0;
+					for (let c = 0; c < bufferLength; c ++) {
+						y = (new Uint8Array(bufferLength))[c] * gui.canvas.height / 256 - 1;
+						gui.ctx.moveTo(x, (gui.canvas.height+ y) / 2;
+						gui.ctx.lineTo(x, gui.canvas.height / 2);
+						gui.ctx.stroke();
+						x += gui.canvas.width / bufferLength;
+					}
+					break;
+				}
+			}
+		}
+	}
 }
 // Document loader
 document.onreadystatechange = function() {
@@ -273,9 +298,12 @@ document.onreadystatechange = function() {
 		gui.time = document.getElementById("time");
 		volumeBtnDown = document.getElementById("volume-btn-minus");
 		volumeBtnUp = document.getElementById("volume-btn-plus");
+		gui.canvas = document.getElementById("audio-visualizer");
 		mediaMode = "S";
 		// Force zero volume
 		video.muted = true;
+		// Default visualizer
+		visualizerMode = "oscillo";
 		// Load
 		video.addEventListener("readystatechange", function() {
 			if (this.readyState == 4) {
@@ -665,6 +693,7 @@ function loadBlobMedia(files) {
 			vcs = [blobMedia.name];
 			video.src = blobURL;
 			audio.src = blobURL;
+			analyzeAudio();
 		} else if (files[count].type == "") {
 			let fileName = files[count].name;
 			switch (fileName.split(".")[fileName.split(".").length - 1].toLowerCase()) {
@@ -717,6 +746,7 @@ function loadURLMedia(url, name = lang.defaultTitle) {
 				blobURL = URL.createObjectURL(blobMedia);
 				video.src = blobURL;
 				audio.src = blobURL;
+				analyzeAudio();
 			};
 		}
 	};
@@ -740,20 +770,32 @@ function loadURLMedia(url, name = lang.defaultTitle) {
 		info.file = url;
 		mediaMode = "S";
 		vcs = url.split("/");
+		analyzeAudio();
 	};
 	URLMediaRequest.send();
 }
 // Audio
-analyzeAudio = function (blobObj) {
+analyzeAudio = function () {
 	audio.context = new AudioContext();
-	audioFileR = new FileReader();
-	audioFileR.onloadend = function () {
-		audio.context.decodeAudioData(this.result);
+	if (window.mediaMode == "B") {
+		audioFileR = new FileReader();
+		audioFileR.onloadend = function () {
+			audio.context.decodeAudioData(this.result);
+			audio.analyser = audio.context.createAnalyser();
+			audio.analyser.fftSize = 256;
+			audio.bfd = audio.analyser.getByteFrequencyData(new Uint8Array(audio.analyser.frequencyBinCount));
+			audio.bdd = audio.analyser.getByteTimeDomainData(new Uint8Array(audio.analyser.frequencyBinCount));
+			audio.channels = audio.context.createChannelSplitter(audio.analyser.channelCount);
+		};
+		audioFileR.readAsArrayBuffer(blobMedia);
+	} else if (window.mediaMode == "S") {
+		audio.context.createMediaElementSource(audio);
 		audio.analyser = audio.context.createAnalyser();
-		audio.analyser.fftSize = 1024;
+		audio.analyser.fftSize = 256;
 		audio.bfd = audio.analyser.getByteFrequencyData(new Uint8Array(audio.analyser.frequencyBinCount));
-	};
-	audioFileR.readAsArrayBuffer(blobMedia);
+		audio.bdd = audio.analyser.getByteTimeDomainData(new Uint8Array(audio.analyser.frequencyBinCount));
+		audio.channels = audio.context.createChannelSplitter(audio.analyser.channelCount);
+	}
 }
 // Language
 if (window.navigator) {
