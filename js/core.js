@@ -276,11 +276,12 @@ document.onreadystatechange = function() {
 		volumeBtnDown = document.getElementById("volume-btn-minus");
 		volumeBtnUp = document.getElementById("volume-btn-plus");
 		gui.canvas = document.getElementById("audio-visualizer");
+		gui.vidMask = document.getElementById("vid-mask");
 		mediaMode = "S";
 		// Force zero volume
 		video.muted = true;
 		// Default visualizer
-		visualizerMode = "oscillo";
+		visualizerMode = "menu";
 		// Load
 		video.addEventListener("readystatechange", function() {
 			if (this.readyState == 4) {
@@ -399,6 +400,8 @@ document.onreadystatechange = function() {
 		window.onresize = function() {
 			gui.loadAni.style.top = (innerHeight / 2 - 36) + "px";
 			gui.loadAni.style.left = (innerWidth / 2 - 36) + "px";
+			gui.canvas.width = innerWidth;
+			gui.canvas.height = innerHeight;
 		}
 		gui.loadAni.style.top = (innerHeight / 2 - 36) + "px";
 		gui.loadAni.style.left = (innerWidth / 2 - 36) + "px";
@@ -765,6 +768,35 @@ analyzeAudio = function () {
 	audioSP = audioCxt.createScriptProcessor(512, audioMedia.channelCount, audioMedia.channelCount);
 	audioMedia.connect(audioSP);
 	audioSP.connect(audioCxt.destination);
+	visualizer = {};
+	visualizerLastFrame = timeSt(new Date);
+	visualizerCurrentFrame = timeSt(new Date);
+	gui.vidMask.addEventListener("click", function (e) {
+		if (window.debugMode) {
+			console.info(e);
+		}
+		if (e.clientY > 23 && e.clientY < 39) {
+			visualizerMode = "menu";
+		} else if (visualizerMode == "menu") {
+			visualizerMode = currentPanel;
+		}
+	});
+	gui.vidMask.addEventListener("mousemove", function (e) {
+		switch (true) {
+			case (e.clientX < gui.canvas.width / 3 && e.clientY > 44 && e.clientY < gui.canvas.height / 2 - 11): {
+				currentPanel = "osc-xy";
+				break;
+			}
+			case (e.clientX > gui.canvas.width / 3 * 2 && e.clientY < gui.canvas.height - 66 && e.clientY > (gui.canvas.height - 88) / 2 + 44): {
+				currentPanel = "menu3d";
+				break;
+			}
+			default: {
+				currentPanel = visualizerMode;
+			}
+		}
+		mousePos = [e.clientX, e.clientY.toString() + " Panel: " + currentPanel];
+	});
 	audioSP.onaudioprocess = function (e) {
 		input = [];
 		output = [];
@@ -775,17 +807,34 @@ analyzeAudio = function () {
 				output[za][zb] = input[za][zb];
 			}
 		}
-		if (visualizerMode == "oscillo" && audio.paused == false) {
+		if (audio.paused == false || audio.ended == true || audio.currentTime < 0.5) {
+			visualizerLastFrame = visualizerCurrentFrame;
+			gui.ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
+			gui.ctx.fillRect(0, 0, gui.canvas.width, gui.canvas.height);
+			gui.ctx.fillStyle = "#ff0";
+			gui.ctx.strokeStyle = "#ff0";
+			gui.ctx.font = "16px Verdana, Microsoft YaHei, Microsoft YaHei UI, MicrosoftYahei";
+			visualizerCurrentFrame = timeSt(new Date);
+			let visualizerInfo = visualizerMode.toUpperCase() + " " + Math.round(1000 / (visualizerCurrentFrame - visualizerLastFrame)).toString();
+			visualizerInfoMeasure = gui.ctx.measureText(visualizerInfo);
+			gui.ctx.fillText(visualizerInfo + "FPS",4,36);
+			let T_001 = "Mouse: " + mousePos[0] + "," + mousePos[1];
+			let TM_001 = gui.ctx.measureText(T_001);
+			gui.ctx.fillText(T_001, gui.canvas.width - TM_001.width, 36);
+			gui.ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+			gui.ctx.beginPath();
+			gui.ctx.strokeStyle = "transparent";
+			gui.ctx.arc(mousePos[0], parseInt(mousePos[1]), 8, 0, 2 * Math.PI);
+			gui.ctx.fill();
+			gui.ctx.fillStyle = "#ff0";
+		}
+		if (visualizerMode == "osc-xy" && audio.paused == false) {
 			let oscilloArea = 0;
 			if (gui.canvas.width > gui.canvas.height) {
 				oscilloArea = gui.canvas.height;
 			} else {
 				oscilloArea = gui.canvas.width;
 			}
-			gui.ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
-			gui.ctx.fillRect(0, 0, gui.canvas.width, gui.canvas.height);
-			gui.ctx.fillStyle = "#fff";
-			gui.ctx.strokeStyle = "#ff0";
 			gui.ctx.beginPath();
 			if (audioMedia.channelCount > 1) {
 				for (let zc = 1; zc < 512; zc ++) {
@@ -802,7 +851,37 @@ analyzeAudio = function () {
 					gui.ctx.stroke();
 				}
 			}
-			//gui.ctx.stroke();
+		} else {
+			switch (visualizerMode.toLowerCase()) {
+				case "menu": {
+					gui.ctx.strokeWidth = 2;
+					gui.ctx.strokeStyle = "#ff0";
+					gui.ctx.moveTo(0, 44);
+					gui.ctx.lineTo(gui.canvas.width, 44);
+					gui.ctx.stroke();
+					gui.ctx.moveTo(0, gui.canvas.height - 66);
+					gui.ctx.lineTo(gui.canvas.width, gui.canvas.height - 66);
+					gui.ctx.stroke();
+					gui.ctx.moveTo(0, gui.canvas.height / 2 - 11);
+					gui.ctx.lineTo(gui.canvas.width, gui.canvas.height / 2 - 11);
+					gui.ctx.stroke();
+					let TM_001 = gui.ctx.measureText(lang.choose2dVisualizer);
+					gui.ctx.fillStyle = "#ff0";
+					gui.ctx.fillText(lang.choose2dVisualizer, (gui.canvas.width - TM_001) / 2, 36);
+					if (currentPanel == "osc-xy") {
+						gui.ctx.fillStyle = "#0f0";
+					}
+					visualizer.textA = gui.ctx.measureText("OSC-XY");
+					gui.ctx.fillText("OSC-XY", gui.canvas.width / 6 - visualizer.textA.width / 2, gui.canvas.height / 4 - 8);
+					gui.ctx.fillStyle = "#ff0";
+					if (currentPanel == "menu3d") {
+						gui.ctx.fillStyle = "#0f0";
+					}
+					let TM_002 = gui.ctx.measureText("MENU3D");
+					gui.ctx.fillText("MENU3D", gui.canvas.width / 6 * 5 - visualizer.textA.width / 2, gui.canvas.height / 4 * 3 - 8);
+					break;
+				}
+			}
 		}
 	}
 	audioAnl = audioCxt.createAnalyser();
@@ -846,12 +925,13 @@ if (window.navigator) {
 					"charging": "电源已连接",
 					"discharging": "剩余电量",
 					"lowBattery": "电池电量过低！",
-					"noSub": " (无字幕)",
+					"noSub": " (<del>字幕</del>)",
 					"loadedCore": "已经作为核心加载",
 					"loadedSub": "(字幕已加载)",
 					"defaultTitle": "无标题媒体",
 					"loadingBlob": "获取网络资源中",
-					"audioVisualizerStarted": "音频可视化模块已启动"
+					"audioVisualizerStarted": "音频可视化模块已启动",
+					"choose2dVisualizer": "请选择2D可视化效果"
 				}
 				break;
 			case "zh-tw":
@@ -872,12 +952,13 @@ if (window.navigator) {
 					"charging": "正在充電",
 					"discharging": "剩餘電量",
 					"lowBattery": "電池電量太低啦！",
-					"noSub": " (無字幕)",
+					"noSub": " (<del>字幕</del>)",
 					"loadedCore": "已經作為核心裝載",
 					"loadedSub": "(字幕已裝載)",
 					"defaultTitle": "無標題檔案",
 					"loadingBlob": "獲取網路檔案中",
-					"audioVisualizerStarted": "音聲可視化模塊已裝載"
+					"audioVisualizerStarted": "音聲可視化模塊已裝載",
+					"choose2dVisualizer": "請選擇2D可視化效果"
 				}
 			default:
 				console.log("Language: English");
@@ -895,12 +976,13 @@ if (window.navigator) {
 					"charging": "Charging",
 					"discharging": "left",
 					"lowBattery": "Battery too low!",
-					"noSub": " (No Subtitles)",
+					"noSub": " (<del>CC</del>)",
 					"loadedCore": "Loaded as core",
 					"loadedSub": "(CC)",
 					"defaultTitle": "Unknown media",
 					"loadingBlob": "Fetching online content",
-					"audioVisualizerStarted": "Started audio visualizer"
+					"audioVisualizerStarted": "Started audio visualizer",
+					"choose2dVisualizer": "Please choose a 2D visualizer"
 				}
 		}
 	}
