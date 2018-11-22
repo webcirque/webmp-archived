@@ -11,13 +11,11 @@ addEventListener("message", function(e) {
 			}
 		}
 	};
-	cancelAnimationFrame(audioVisualizer);
-	visualizerThread = requestAnimationFrame(audioVisualizer);
 });
 // Thread
 function refresherThreadFunc() {
 	// Save playback info
-	if (video.readyState == 4) {
+	/* if (video.readyState == 4) {
 		if (window.CryptoJS) {
 			if (CryptoJS.SHA1) {
 				let hash = CryptoJS.SHA1(video.currentSrc);
@@ -32,7 +30,7 @@ function refresherThreadFunc() {
 				localStorage.setItem("WEBMPF:" + hash, JSON.stringify(item));
 			}
 		}
-	}
+	} */
 	// Subtitle Sync
 	if (window.subt) {
 		// Will be using elsl.media.subtitles.render
@@ -276,7 +274,10 @@ document.onreadystatechange = function() {
 		volumeBtnDown = document.getElementById("volume-btn-minus");
 		volumeBtnUp = document.getElementById("volume-btn-plus");
 		gui.canvas = document.getElementById("audio-visualizer");
+		gui.canvas.width = gui.canvas.clientWidth;
+		gui.canvas.height = gui.canvas.clientHeight;
 		gui.vidMask = document.getElementById("vid-mask");
+		gui.ctx = gui.canvas.getContext("2d");
 		mediaMode = "S";
 		// Force zero volume
 		video.muted = true;
@@ -409,8 +410,8 @@ document.onreadystatechange = function() {
 		fps.last = new Date();
 		fps.curr = new Date();
 		// Load refresher
-		refresherThread = setInterval(refresherThreadFunc, 20);
-		visualizerThread = requestAnimationFrame(audioVisualizer);
+		refresherThread = setInterval(refresherThreadFunc, 33.3);
+		visualizerThread = setInterval(audioVisualizer, 12.5);
 		// Load media
 		if (window.TabSearch) {
 			info = TabSearch(location.search);
@@ -443,13 +444,14 @@ document.onreadystatechange = function() {
 		// Smart resource
 		document.body.onblur = function() {
 			clearInterval(refresherThread);
-			cancelAnimationFrame(audioVisualizer);
+			clearInterval(visualizerThread);
 			refresherThread = setInterval(refresherThreadFunc, 1000);
+			visualizerThread = setInterval(audioVisualizer, 1000);
 			console.log(lang.resourceSlowed);
 			document.body.onfocus = function() {
 				clearInterval(refresherThread);
-				refresherThread = setInterval(refresherThreadFunc, 20);
-				visualizerThread = requestAnimationFrame(audioVisualizer);
+				refresherThread = setInterval(refresherThreadFunc, 33.3);
+				visualizerThread = setInterval(audioVisualizer, 12.5);
 				console.log(lang.resourceRegained);
 			}
 		}
@@ -567,8 +569,6 @@ document.onreadystatechange = function() {
 		document.body.addEventListener("dragleave", function (e) {
 			e.preventDefault();
 			e.stopPropagation();
-			cancelAnimationFrame(audioVisualizer);
-			visualizerThread = requestAnimationFrame(audioVisualizer);
 		}, true);
 		document.body.addEventListener("drop", function (e) {
 			e.preventDefault();
@@ -576,8 +576,6 @@ document.onreadystatechange = function() {
 			let count = 0;
 			let df = e.dataTransfer;
 			loadBlobMedia(df.files);
-			cancelAnimationFrame(audioVisualizer);
-			visualizerThread = requestAnimationFrame(audioVisualizer);
 		}, true);
 	}
 }
@@ -763,40 +761,20 @@ function loadURLMedia(url, name = lang.defaultTitle) {
 }
 // Audio
 analyzeAudio = function () {
-	audioCxt = new AudioContext();
-	audioMedia = audioCxt.createMediaElementSource(audio);
-	audioSP = audioCxt.createScriptProcessor(512, audioMedia.channelCount, audioMedia.channelCount);
-	audioMedia.connect(audioSP);
-	audioSP.connect(audioCxt.destination);
+	if (!(window.audioConnected)) {
+		audioCxt = new AudioContext();
+		audioMedia = audioCxt.createMediaElementSource(audio);
+		audioSP = audioCxt.createScriptProcessor(512, audioMedia.channelCount, audioMedia.channelCount);
+		audioMedia.connect(audioSP);
+		audioSP.connect(audioCxt.destination);
+		audioAnl = audioCxt.createAnalyser();
+		audioChannels = audioCxt.createChannelSplitter(audioMedia.channelCount);
+		audioMedia.connect(audioAnl);
+		audioConnected = true;
+	}
 	visualizer = {};
 	visualizerLastFrame = timeSt(new Date);
 	visualizerCurrentFrame = timeSt(new Date);
-	gui.vidMask.addEventListener("click", function (e) {
-		if (window.debugMode) {
-			console.info(e);
-		}
-		if (e.clientY > 23 && e.clientY < 39) {
-			visualizerMode = "menu";
-		} else if (visualizerMode == "menu") {
-			visualizerMode = currentPanel;
-		}
-	});
-	gui.vidMask.addEventListener("mousemove", function (e) {
-		switch (true) {
-			case (e.clientX < gui.canvas.width / 3 && e.clientY > 44 && e.clientY < gui.canvas.height / 2 - 11): {
-				currentPanel = "osc-xy";
-				break;
-			}
-			case (e.clientX > gui.canvas.width / 3 * 2 && e.clientY < gui.canvas.height - 66 && e.clientY > (gui.canvas.height - 88) / 2 + 44): {
-				currentPanel = "menu3d";
-				break;
-			}
-			default: {
-				currentPanel = visualizerMode;
-			}
-		}
-		mousePos = [e.clientX, e.clientY.toString() + " Panel: " + currentPanel];
-	});
 	audioSP.onaudioprocess = function (e) {
 		input = [];
 		output = [];
@@ -807,98 +785,36 @@ analyzeAudio = function () {
 				output[za][zb] = input[za][zb];
 			}
 		}
-		if (audio.paused == false || audio.ended == true || audio.currentTime < 0.5) {
-			visualizerLastFrame = visualizerCurrentFrame;
-			gui.ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
-			gui.ctx.fillRect(0, 0, gui.canvas.width, gui.canvas.height);
-			gui.ctx.fillStyle = "#ff0";
-			gui.ctx.strokeStyle = "#ff0";
-			gui.ctx.font = "16px Verdana, Microsoft YaHei, Microsoft YaHei UI, MicrosoftYahei";
-			visualizerCurrentFrame = timeSt(new Date);
-			let visualizerInfo = visualizerMode.toUpperCase() + " " + Math.round(1000 / (visualizerCurrentFrame - visualizerLastFrame)).toString();
-			visualizerInfoMeasure = gui.ctx.measureText(visualizerInfo);
-			gui.ctx.fillText(visualizerInfo + "FPS",4,36);
-			let T_001 = "Mouse: " + mousePos[0] + "," + mousePos[1];
-			let TM_001 = gui.ctx.measureText(T_001);
-			gui.ctx.fillText(T_001, gui.canvas.width - TM_001.width, 36);
-			gui.ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
-			gui.ctx.beginPath();
-			gui.ctx.strokeStyle = "transparent";
-			gui.ctx.arc(mousePos[0], parseInt(mousePos[1]), 8, 0, 2 * Math.PI);
-			gui.ctx.fill();
-			gui.ctx.fillStyle = "#ff0";
-		}
-		if (visualizerMode == "osc-xy" && audio.paused == false) {
+	}
+}
+// Audio Visualizer
+function audioVisualizer () {
+	if (gui.canvas && video.videoWidth * video.videoHeight < 16 && (audio.paused == false || audio.ended == true || audio.currentTime < 0.5)) {
+		gui.ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
+		gui.ctx.fillRect(0, 0, gui.canvas.width, gui.canvas.height);
+		gui.ctx.fillStyle = "#ff0";
+		if (window.audioCxt) {
 			let oscilloArea = 0;
 			if (gui.canvas.width > gui.canvas.height) {
 				oscilloArea = gui.canvas.height;
 			} else {
 				oscilloArea = gui.canvas.width;
 			}
-			gui.ctx.beginPath();
 			if (audioMedia.channelCount > 1) {
-				for (let zc = 1; zc < 512; zc ++) {
+				let jumpSample = 1;
+				for (let zc = 1; zc < 512 / jumpSample; zc ++) {
 					let lineTransparency = 0;
-					let lineThreshold = 0.08;
-					let lineLength = Math.sqrt(((input[0][zc] - input[0][zc-1]) / audio.volume) ** 2 + ((input[1][zc] - input[1][zc-1]) / audio.volume) ** 2);
+					let lineThreshold = 0.1 * jumpSample;
+					let lineLength = Math.sqrt(((input[0][zc * jumpSample] - input[0][zc-1]) / audio.volume) ** 2 + ((input[1][zc] - input[1][(zc-1) * jumpSample]) / audio.volume) ** 2);
 					if (lineLength < lineThreshold) {
-						lineTransparency = Math.cos(Math.PI * lineLength / 2 / lineThreshold);
+						lineTransparency = (-1) * lineLength / lineThreshold + 1;
 					}
 					gui.ctx.strokeStyle = "rgba(255,255,0,"+ lineTransparency + ")";
 					gui.ctx.beginPath();
-					gui.ctx.moveTo((-1) * input[0][zc-1] * oscilloArea * 0.9 / audio.volume + gui.canvas.width / 2, input[1][zc-1] * oscilloArea * 0.9 / audio.volume + gui.canvas.height / 2);
-					gui.ctx.lineTo((-1) * input[0][zc] * oscilloArea * 0.9 / audio.volume + gui.canvas.width / 2, input[1][zc] * oscilloArea * 0.9 / audio.volume + gui.canvas.height / 2);
+					gui.ctx.moveTo((-1) * input[0][(zc-1) * jumpSample] * oscilloArea * 0.9 / audio.volume + gui.canvas.width / 2, input[1][(zc-1) * jumpSample] * oscilloArea * 0.9 / audio.volume + gui.canvas.height / 2);
+					gui.ctx.lineTo((-1) * input[0][zc * jumpSample] * oscilloArea * 0.9 / audio.volume + gui.canvas.width / 2, input[1][zc * jumpSample] * oscilloArea * 0.9 / audio.volume + gui.canvas.height / 2);
 					gui.ctx.stroke();
 				}
-			}
-		} else {
-			switch (visualizerMode.toLowerCase()) {
-				case "menu": {
-					gui.ctx.strokeWidth = 2;
-					gui.ctx.strokeStyle = "#ff0";
-					gui.ctx.moveTo(0, 44);
-					gui.ctx.lineTo(gui.canvas.width, 44);
-					gui.ctx.stroke();
-					gui.ctx.moveTo(0, gui.canvas.height - 66);
-					gui.ctx.lineTo(gui.canvas.width, gui.canvas.height - 66);
-					gui.ctx.stroke();
-					gui.ctx.moveTo(0, gui.canvas.height / 2 - 11);
-					gui.ctx.lineTo(gui.canvas.width, gui.canvas.height / 2 - 11);
-					gui.ctx.stroke();
-					let TM_001 = gui.ctx.measureText(lang.choose2dVisualizer);
-					gui.ctx.fillStyle = "#ff0";
-					gui.ctx.fillText(lang.choose2dVisualizer, (gui.canvas.width - TM_001) / 2, 36);
-					if (currentPanel == "osc-xy") {
-						gui.ctx.fillStyle = "#0f0";
-					}
-					visualizer.textA = gui.ctx.measureText("OSC-XY");
-					gui.ctx.fillText("OSC-XY", gui.canvas.width / 6 - visualizer.textA.width / 2, gui.canvas.height / 4 - 8);
-					gui.ctx.fillStyle = "#ff0";
-					if (currentPanel == "menu3d") {
-						gui.ctx.fillStyle = "#0f0";
-					}
-					let TM_002 = gui.ctx.measureText("MENU3D");
-					gui.ctx.fillText("MENU3D", gui.canvas.width / 6 * 5 - visualizer.textA.width / 2, gui.canvas.height / 4 * 3 - 8);
-					break;
-				}
-			}
-		}
-	}
-	audioAnl = audioCxt.createAnalyser();
-	audioChannels = audioCxt.createChannelSplitter(audioAnl.channelCount);
-}
-// Audio Visualizer
-function audioVisualizer () {
-	if (gui.canvas) {
-		gui.canvas.width = gui.canvas.clientWidth;
-		gui.canvas.height = gui.canvas.clientHeight;
-		gui.ctx = gui.canvas.getContext("2d");
-		gui.ctx.fillStyle = "#fff";
-		gui.ctx.strokeStyle = "#ff0";
-		let x = 0;
-		if (window.audioCxt) {
-			if (visualizerMode == "fft") {
-				//
 			}
 		}
 	}
