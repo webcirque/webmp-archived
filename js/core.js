@@ -1,36 +1,81 @@
 ﻿// Message
 addEventListener("message", function(e) {
-	if (e.data.type == "info:gui") {
-		switch (e.data.specify) {
-			case "playBlobMedia": {
-				loadBlobMedia(e.data.data);
-				break;
+	switch (e.data.type) {
+		case "info:gui": {
+			switch (e.data.specify) {
+				case "playBlobMedia": {
+					loadBlobMedia(e.data.data);
+					break;
+				};
+				case "playURLMedia": {
+					loadURLMedia(e.data.data);
+					break;
+				};
 			};
-			case "playURLMedia": {
-				loadURLMedia(e.data.data);
-			}
-		}
+			break;
+		};
+		case "info:settings": {
+			switch (e.data.specify) {
+				case "changeVisualizerMode": {
+					visualizerMode = e.data.data;
+					break;
+				};
+			};
+		};
 	};
 });
-// Thread
-function refresherThreadFunc() {
+// Data saving thread
+function dataSaverThreadFunc() {
 	// Save playback info
-	/* if (video.readyState == 4) {
+	if (video.readyState == 4) {
 		if (window.CryptoJS) {
 			if (CryptoJS.SHA1) {
-				let hash = CryptoJS.SHA1(video.currentSrc);
+				let hash = "";
+				if (info.file) {
+					hash = CryptoJS.SHA1(video.currentSrc);
+				} else if (blobMedia) {
+					hash = CryptoJS.SHA1(blobMedia.name);
+				}
 				let item = {
 					"currentTime": video.currentTime,
 					"currentVolume": audio.volume,
-					"offset": config.delay
+					"offset": config.delay,
+					"currentPlaybackRate": audio.playbackRate,
+					"mediaInfo": {
+						"mediaName": gui.title.innerHTML,
+						"mediaDuration": audio.duration
+					}
 				}
 				if (window.subt) {
-					item.subtitle = subt.caption;
+					item.subtitle = subt.text;
 				}
+				if (window.mediaMode == "B") {
+					item.origin = blobURL;
+					item.mediaType = blobMedia.type;
+				} else if (window.mediaMode == "S") {
+					item.origin = video.currentSrc;
+				}
+				if (video.videoHeight * video.videoWidth > 0) {
+					item.mediaInfo.frameWidth = video.videoWidth;
+					item.mediaInfo.frameHeight = video.videoHeight;
+				}
+				/* if (window.output) {
+					let audio512Data = [];
+					for (let ce = 0; ce < output.length; ce ++) {
+						audio512Data[ce] = [];
+						for (let cf = 0; cf < 16; cf ++) {
+							audio512Data[ce][cf] = Math.floor(output[ce][cf] * 100000) / 100000;
+						}
+					}
+					item.lastAudio512Data = audio512Data;
+				} */
 				localStorage.setItem("WEBMPF:" + hash, JSON.stringify(item));
 			}
 		}
-	} */
+	}
+}
+// Refresher thread
+function refresherThreadFunc() {
 	// Subtitle Sync
 	if (window.subt) {
 		// Will be using elsl.media.subtitles.render
@@ -185,7 +230,7 @@ function refresherThreadFunc() {
 			exchangeData.start = info.start;
 		}
 	}
-	window.top.postMessage(exchangeData, "*");
+	window.parent.postMessage(exchangeData, "*");
 	// Volume icon
 	if (audio.volume > 0.6 && audio.muted == false) {
 		gui.volume.src = "img/volumeUp.png";
@@ -244,6 +289,7 @@ document.onreadystatechange = function() {
 		document.body.tabIndex = "-1";
 		config = {};
 		config.delay = 0;
+		inactive = false;
 		video = document.getElementsByTagName("video")[0];
 		audio = document.getElementsByTagName("audio")[0];
 		let files = document.getElementById("fbtn");
@@ -282,7 +328,10 @@ document.onreadystatechange = function() {
 		// Force zero volume
 		video.muted = true;
 		// Default visualizer
-		visualizerMode = "menu";
+		visualizerMode = "empty";
+		visualizerModeList = ["empty", "osc-xy", "fft", "osc"];
+		// Data saving thread
+		dataSaverThread = setInterval(dataSaverThreadFunc, 500);
 		// Load
 		video.addEventListener("readystatechange", function() {
 			if (this.readyState == 4) {
@@ -308,6 +357,24 @@ document.onreadystatechange = function() {
 				}
 			}
 		});
+		// Show playback settings
+		gui.vidMask.oncontextmenu = function () {
+			window.parent.postMessage({
+				"type": "jump:settings",
+				"specify": "originalFrame",
+				"data": "player-core"
+			}, "*");
+			window.parent.postMessage({
+				"type": "forward:settings",
+				"specify": "player-core",
+				"data": {
+					"type": "info:gui",
+					"specify": "enterSettingsTab",
+					"data": "playback"
+				}
+			}, "*");
+			return false;
+		}
 		// Subtitles loader
 		gui.sub.onclick = function() {
 			gui.subfbtn.click();
@@ -444,14 +511,14 @@ document.onreadystatechange = function() {
 		// Smart resource
 		document.body.onblur = function() {
 			clearInterval(refresherThread);
-			clearInterval(visualizerThread);
+			//clearInterval(visualizerThread);
 			refresherThread = setInterval(refresherThreadFunc, 1000);
-			visualizerThread = setInterval(audioVisualizer, 1000);
 			console.log(lang.resourceSlowed);
+			window.inactive = true;
 			document.body.onfocus = function() {
+				window.inactive = false;
 				clearInterval(refresherThread);
 				refresherThread = setInterval(refresherThreadFunc, 33.3);
-				visualizerThread = setInterval(audioVisualizer, 12.5);
 				console.log(lang.resourceRegained);
 			}
 		}
@@ -789,31 +856,45 @@ analyzeAudio = function () {
 }
 // Audio Visualizer
 function audioVisualizer () {
-	if (gui.canvas && video.videoWidth * video.videoHeight < 16 && (audio.paused == false || audio.ended == true || audio.currentTime < 0.5)) {
-		gui.ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
-		gui.ctx.fillRect(0, 0, gui.canvas.width, gui.canvas.height);
-		gui.ctx.fillStyle = "#ff0";
-		if (window.audioCxt) {
-			let oscilloArea = 0;
-			if (gui.canvas.width > gui.canvas.height) {
-				oscilloArea = gui.canvas.height;
-			} else {
-				oscilloArea = gui.canvas.width;
-			}
-			if (audioMedia.channelCount > 1) {
-				let jumpSample = 1;
-				for (let zc = 1; zc < 512 / jumpSample; zc ++) {
-					let lineTransparency = 0;
-					let lineThreshold = 0.1 * jumpSample;
-					let lineLength = Math.sqrt(((input[0][zc * jumpSample] - input[0][zc-1]) / audio.volume) ** 2 + ((input[1][zc] - input[1][(zc-1) * jumpSample]) / audio.volume) ** 2);
-					if (lineLength < lineThreshold) {
-						lineTransparency = (-1) * lineLength / lineThreshold + 1;
+	if (!(window.inactive)) {
+		switch (visualizerMode.toLowerCase()) {
+			case "osc-xy": {
+				if (gui.canvas && video.videoHeight * video.videoWidth < 16 && audio.paused == false) {
+					canvasCleared = false;
+					gui.ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
+					gui.ctx.fillRect(0, 0, gui.canvas.width, gui.canvas.height);
+					gui.ctx.fillStyle = "#ff0";
+					if (window.audioCxt) {
+						let oscilloArea = 0;
+						if (gui.canvas.width > gui.canvas.height) {
+							oscilloArea = gui.canvas.height;
+						} else {
+							oscilloArea = gui.canvas.width;
+						}
+						if (audioMedia.channelCount > 1) {
+							let jumpSample = 1;
+							for (let zc = 1; zc < 512 / jumpSample; zc ++) {
+								let lineTransparency = 0;
+								let lineThreshold = 0.1 * jumpSample;
+								let lineLength = Math.sqrt(((input[0][zc * jumpSample] - input[0][zc-1]) / audio.volume) ** 2 + ((input[1][zc] - input[1][(zc-1) * jumpSample]) / audio.volume) ** 2);
+								if (lineLength < lineThreshold) {
+									lineTransparency = (-1) * lineLength / lineThreshold + 1;
+								}
+								gui.ctx.strokeStyle = "rgba(255,255,0,"+ lineTransparency + ")";
+								gui.ctx.beginPath();
+								gui.ctx.moveTo((-1) * input[0][(zc-1) * jumpSample] * oscilloArea * 0.9 / audio.volume + gui.canvas.width / 2, input[1][(zc-1) * jumpSample] * oscilloArea * 0.9 / audio.volume + gui.canvas.height / 2);
+								gui.ctx.lineTo((-1) * input[0][zc * jumpSample] * oscilloArea * 0.9 / audio.volume + gui.canvas.width / 2, input[1][zc * jumpSample] * oscilloArea * 0.9 / audio.volume + gui.canvas.height / 2);
+								gui.ctx.stroke();
+							}
+						}
 					}
-					gui.ctx.strokeStyle = "rgba(255,255,0,"+ lineTransparency + ")";
-					gui.ctx.beginPath();
-					gui.ctx.moveTo((-1) * input[0][(zc-1) * jumpSample] * oscilloArea * 0.9 / audio.volume + gui.canvas.width / 2, input[1][(zc-1) * jumpSample] * oscilloArea * 0.9 / audio.volume + gui.canvas.height / 2);
-					gui.ctx.lineTo((-1) * input[0][zc * jumpSample] * oscilloArea * 0.9 / audio.volume + gui.canvas.width / 2, input[1][zc * jumpSample] * oscilloArea * 0.9 / audio.volume + gui.canvas.height / 2);
-					gui.ctx.stroke();
+				}
+				break;
+			}
+			case "empty": {
+				if (gui.canvas && !(window.canvasCleared)) {
+					gui.ctx.clearRect(0, 0, gui.canvas.width, gui.canvas.height);
+					canvasCleared = true;
 				}
 			}
 		}
