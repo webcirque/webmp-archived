@@ -373,6 +373,7 @@ document.onreadystatechange = function() {
 					"data": "playback"
 				}
 			}, "*");
+			
 			return false;
 		}
 		// Subtitles loader

@@ -33,13 +33,56 @@ document.onreadystatechange = function () {
 		wmpMenuBar.btnList = Array.from(wmpMenuBar.getElementsByTagName("div"));
 		wmpDisplay = document.getElementById("display");
 		wmpPlayerCore = document.getElementById("player-core");
+		wmpSettingsTab = document.getElementById("settings-tab");
 		window.onresize = wmpResizeWindow;
 		wmpResizeWindow();
 		// Receive data
 		addEventListener("message", function (ev) {
-			if (ev.data.type == "info:player-core") {
-				coreData = ev.data;
-				document.title = coreData.title;
+			switch (ev.data.type.split(":")[0]) {
+				case "info": {
+					switch (ev.data.type) {
+						case "info:player-core": {
+							coreData = ev.data;
+							document.title = coreData.title;
+						};
+						default: {
+						}
+					}
+					break;
+				};
+				case "forward": {
+					switch (ev.data.type) {
+						case "forward:player-core": {
+							wmpPlayerCore.contentWindow.postMessage(ev.data.data, "*");
+						};
+						case "forward:settings": {
+							wmpSettingsTab.contentWindow.postMessage(ev.data.data, "*");
+						};
+					}
+					break;
+				};
+				case "jump": {
+					let count = 0;
+					while (count < wmpMenuBar.btnList.length) {
+						wmpMenuBar.btnList[count].className = "tab-item";
+						count++;
+					};
+					switch (ev.data.type) {
+						case "jump:settings": {
+							hideAllTabs();
+							wmpMenuBar.btnList[5].className = "tab-item-active";
+							document.getElementById("settings-tab").style.display = "";
+						};
+					}
+					break;
+				};
+				case "output": {
+					window.open("data:text/csv," + encodeURIComponent(ev.data.data));
+					break;
+				}
+			}
+			if (window.debugMode) {
+				console.info(ev.data);
 			}
 		});
 		// Actions for items
