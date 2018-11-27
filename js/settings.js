@@ -29,7 +29,7 @@ if (window.navigator) {
 					"playlistSettings": "播放列表设置",
 					"searchSettings": "搜索设置",
 					"historySettings": "历史设置"
-				}
+				};
 				break;
 			case "zh-hant":
 			case "zh-tw":
@@ -46,7 +46,22 @@ if (window.navigator) {
 					"playlistSettings": "媒體列表設定",
 					"searchSettings": "檢索設定",
 					"historySettings": "足跡設定"
-				}
+				};
+				break;
+			default:
+				lang = {
+					"mainSettings": "Settings",
+					"playbackSettings": "Playback",
+					"playback": {
+						"visualizer": "Visualizer",
+						"audioMode": "Audio output mode"
+					},
+					"miscSettings": "Miscellaneous",
+					"displaySettings": "Display",
+					"playlistSettings": "Playlist",
+					"searchSettings": "Search",
+					"historySettings": "History"
+				};
 				break;
 		}
 	}
@@ -72,7 +87,8 @@ document.onreadystatechange = function () {
 				"display": _q("#settings-display"),
 				"search": _q("#settings-search"),
 				"history": _q("#settings-history"),
-				"playlist": _q("#settings-playlist")
+				"playlist": _q("#settings-playlist"),
+				"visualizer": _q("#settings-visualizer")
 			};
 			settingSwitchTo = function (t) {
 				for (let settingTabName in settingTabs) {
@@ -126,7 +142,47 @@ document.onreadystatechange = function () {
 						settingSwitchTo("search");
 					}
 				});
-			}
+				_qa("#text-visualizer").forEach(function (e) {
+					e.innerHTML = lang.playback.visualizer;
+					e.onclick = () => {
+						settingSwitchTo("visualizer");
+					}
+				});
+			};
+			let visualizerModeList = ["empty", "osc-xy", "fft"];
+			_q("#drawer-visualizer #text-visualizer-empty").onclick = () => {
+				window.parent.postMessage({
+					"type": "forward:player-core",
+					"data": {
+						"type": "info:settings",
+						"specify": "changeVisualizerMode",
+						"data": "empty"
+					}
+				}, "*");
+				localStorage.setItem("WEBMPS:visualizer", "\"empty\"");
+			};
+			_q("#drawer-visualizer #text-visualizer-oscxy").onclick = () => {
+				window.parent.postMessage({
+					"type": "forward:player-core",
+					"data": {
+						"type": "info:settings",
+						"specify": "changeVisualizerMode",
+						"data": "osc-xy"
+					}
+				}, "*");
+				localStorage.setItem("WEBMPS:visualizer", "\"osc-xy\"");
+			};
+			_q("#drawer-visualizer #text-visualizer-fft").onclick = () => {
+				window.parent.postMessage({
+					"type": "forward:player-core",
+					"data": {
+						"type": "info:settings",
+						"specify": "changeVisualizerMode",
+						"data": "fft"
+					}
+				}, "*");
+				localStorage.setItem("WEBMPS:visualizer", "\"fft\"");
+			};
 			break;
 		};
 		case "complete": {

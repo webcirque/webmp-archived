@@ -26,7 +26,7 @@ hideAllTabs = function () {
 }
 
 // Load document
-document.onreadystatechange = function () {
+document.addEventListener("readystatechange", function () {
 	if (this.readyState.toLowerCase() == "interactive") {
 		// Load elements
 		wmpMenuBar = document.getElementById("menubar");
@@ -79,7 +79,28 @@ document.onreadystatechange = function () {
 				case "output": {
 					window.open("data:text/csv," + encodeURIComponent(ev.data.data));
 					break;
-				}
+				};
+				case "ready": {
+					switch (ev.data.type) {
+						case "ready:player-core": {
+							if (ev.data.specify == "requireBasic") {
+								let visualizerSetup = eval(localStorage.getItem("WEBMPS:visualizer"));
+								if (new Boolean(visualizerSetup)) {
+									wmpPlayerCore.contentWindow.postMessage({
+										"type": "info:settings",
+										"specify": "changeVisualizerMode",
+										"data": visualizerSetup.toLowerCase()
+									}, "*");
+									console.warn("Visualizer: " + visualizerSetup);
+								} else {
+									console.info("No visualizer set.");
+								}
+							}
+							break;
+						}
+					};
+					break;
+				};
 			}
 			if (window.debugMode) {
 				console.info(ev.data);
@@ -174,4 +195,4 @@ document.onreadystatechange = function () {
 			return false;
 		};
 	}
-}
+});

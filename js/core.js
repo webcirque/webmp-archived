@@ -59,16 +59,6 @@ function dataSaverThreadFunc() {
 					item.mediaInfo.frameWidth = video.videoWidth;
 					item.mediaInfo.frameHeight = video.videoHeight;
 				}
-				/* if (window.output) {
-					let audio512Data = [];
-					for (let ce = 0; ce < output.length; ce ++) {
-						audio512Data[ce] = [];
-						for (let cf = 0; cf < 16; cf ++) {
-							audio512Data[ce][cf] = Math.floor(output[ce][cf] * 100000) / 100000;
-						}
-					}
-					item.lastAudio512Data = audio512Data;
-				} */
 				localStorage.setItem("WEBMPF:" + hash, JSON.stringify(item));
 			}
 		}
@@ -645,6 +635,11 @@ document.onreadystatechange = function() {
 			let df = e.dataTransfer;
 			loadBlobMedia(df.files);
 		}, true);
+		// Inform history
+		window.parent.postMessage({
+			"type": "ready:player-core",
+			"specify": "requireBasic"
+		}, "*");
 	}
 }
 // Volume public method
@@ -891,11 +886,35 @@ function audioVisualizer () {
 					}
 				}
 				break;
-			}
+			};
 			case "empty": {
 				if (gui.canvas && !(window.canvasCleared)) {
 					gui.ctx.clearRect(0, 0, gui.canvas.width, gui.canvas.height);
 					canvasCleared = true;
+				}
+				break;
+			};
+			case "fft": {
+				if (gui.canvas && video.videoHeight * video.videoWidth < 16 && audio.paused == false) {
+					canvasCleared = false;
+					gui.ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+					gui.ctx.clearRect(0, 0, gui.canvas.width, gui.canvas.height);
+					audioFloatData = new Uint8Array(audioAnl.frequencyBinCount);
+					audioAnl.getByteFrequencyData(audioFloatData);
+					frequencyDivision = 2 ** Math.floor(Math.log2(gui.canvas.width / 8));
+					frequencyWidth = 1024 / frequencyDivision;
+					barWidth = gui.canvas.width / frequencyDivision;
+					shrunkAudioData = [];
+					for (let ze = 0; ze < frequencyDivision; ze ++) {
+						shrunkAudioData[shrunkAudioData.length] = Math.round(Math.max(...Array.from(audioFloatData.slice(frequencyWidth * ze, frequencyWidth * (ze + 1) - 1))) / 255 * 1000) / 1000;
+					}
+					shrunkAudioData.forEach((e, i) => {
+						gui.ctx.fillStyle = "#ff0";
+						gui.ctx.fillRect(i * barWidth, gui.canvas.height * (1 - shrunkAudioData[i]), barWidth, gui.canvas.height * shrunkAudioData[i]);
+					});
+					gui.ctx.font = "16px Verdana";
+					gui.ctx.textAlign = "end";
+					gui.ctx.fillText("FW:" + frequencyWidth.toString(), gui.canvas.width - 1, 36);
 				}
 			}
 		}
@@ -923,9 +942,9 @@ if (window.navigator) {
 					"charging": "电源已连接",
 					"discharging": "剩余电量",
 					"lowBattery": "电池电量过低！",
-					"noSub": " (<del>字幕</del>)",
+					"noSub": " (<font color=\"#f00\">字幕</font>)",
 					"loadedCore": "已经作为核心加载",
-					"loadedSub": "(字幕已加载)",
+					"loadedSub": "(<font color=\"#0f0\">字幕</font>)",
 					"defaultTitle": "无标题媒体",
 					"loadingBlob": "获取网络资源中",
 					"audioVisualizerStarted": "音频可视化模块已启动",
@@ -950,14 +969,15 @@ if (window.navigator) {
 					"charging": "正在充電",
 					"discharging": "剩餘電量",
 					"lowBattery": "電池電量太低啦！",
-					"noSub": " (<del>字幕</del>)",
+					"noSub": " (<font color=\"#f00\">字幕</font>)",
 					"loadedCore": "已經作為核心裝載",
-					"loadedSub": "(字幕已裝載)",
+					"loadedSub": "(<font color=\"#0f0\">字幕</font>)",
 					"defaultTitle": "無標題檔案",
 					"loadingBlob": "獲取網路檔案中",
 					"audioVisualizerStarted": "音聲可視化模塊已裝載",
 					"choose2dVisualizer": "請選擇2D可視化效果"
-				}
+				};
+				break;
 			default:
 				console.log("Language: English");
 				lang = {
@@ -974,9 +994,9 @@ if (window.navigator) {
 					"charging": "Charging",
 					"discharging": "left",
 					"lowBattery": "Battery too low!",
-					"noSub": " (<del>CC</del>)",
+					"noSub": " (<font color=\"#f00\">CC</font>)",
 					"loadedCore": "Loaded as core",
-					"loadedSub": "(CC)",
+					"loadedSub": "(<font color=\"#0f0\">CC</font>)",
 					"defaultTitle": "Unknown media",
 					"loadingBlob": "Fetching online content",
 					"audioVisualizerStarted": "Started audio visualizer",
