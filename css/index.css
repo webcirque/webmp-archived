@@ -25,6 +25,19 @@ div#menubar {
 	padding: 0;
 }
 
+#unsupported, #firefox-notice {
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: #000;
+	color: #f44;
+}
+
+#firefox-notice {
+	display: none;
+}
+
 div#display {
 	height: 100%;
 	right: 0;
