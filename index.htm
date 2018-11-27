@@ -3,9 +3,11 @@
 	<title>WebMP 0.28</title>
 	<meta content="true" name="HandheldFriendly"/>
 	<meta content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" name="viewport"/>
+	<meta charset="UTF-8" />
 	<script src="libs/elsl.pre1.js"></script>
 	<link rel="stylesheet" href="css/index.css"></link>
 	<script src="js/index.js"></script>
+	<script src="js/support.js"></script>
 	<link href="img/icon.png" rel="shortcut icon"/>
 </head>
 <body>
@@ -40,5 +42,20 @@
 		<iframe id="search-tab" src="search.htm" style="display: none"></iframe>
 		<iframe id="settings-tab" src="settings.htm" style="display: none"></iframe>
 		<iframe id="info-tab" src="info.htm" style="display: none"></iframe>
+	</div>
+	<div id="firefox-notice">
+		<big>Firefox users cannot experience the best use of WebMP. Switch to Chrome or Opera please!</big><br/>
+		<big>使用Firefox并不能获得对WebMP的最佳体验。换成Chrome或者是Opera吧！</big><br/>
+		<big>使用Firefox並不能獲得對WebMP的最佳體驗。換成Chrome或者是Opera吧！</big><br/>
+		<button onclick="this.parentElement.remove()">DISMISS - 忽略</button>
+	</div>
+	<div id="unsupported">
+		<big>Sorry, but this browser not supported. Please switch to Chrome or Opera, they are better.</big>
+		<br/>
+		<big>抱歉，本浏览器不受支持。请改用Chrome或者Opera浏览器，它们更好。</big>
+		<br/>
+		<big>抱歉，本瀏覽器不受支援。請使用Chrome或者Opera瀏覽器，它們更好。</big>
+		<br/>
+		<big>ごめんなさい。このブラウザ—は支援しない。ChromeやOperaを使って下さい。それはとっても良いですよ。</big>
 	</div>
 </body>
