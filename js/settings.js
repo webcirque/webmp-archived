@@ -183,6 +183,17 @@ document.onreadystatechange = function () {
 				}, "*");
 				localStorage.setItem("WEBMPS:visualizer", "\"fft\"");
 			};
+			_q("#drawer-visualizer #text-visualizer-fft-f").onclick = () => {
+				window.parent.postMessage({
+					"type": "forward:player-core",
+					"data": {
+						"type": "info:settings",
+						"specify": "changeVisualizerMode",
+						"data": "fft-f"
+					}
+				}, "*");
+				localStorage.setItem("WEBMPS:visualizer", "\"fft-f\"");
+			};
 			break;
 		};
 		case "complete": {
