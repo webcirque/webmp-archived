@@ -943,6 +943,7 @@ function audioVisualizer () {
 					});
 					gui.ctx.font = "16px Verdana";
 					gui.ctx.textAlign = "end";
+					gui.ctx.fillStyle = "#ff0";
 					gui.ctx.fillText("1024-" + frequencyWidth.toString() + "Hz", gui.canvas.width - 1, 36);
 				}
 				break;
