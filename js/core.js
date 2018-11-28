@@ -833,6 +833,7 @@ analyzeAudio = function () {
 		audioAnl = audioCxt.createAnalyser();
 		audioChannels = audioCxt.createChannelSplitter(audioMedia.channelCount);
 		audioMedia.connect(audioAnl);
+		audioAnl.minDecibels = -130;
 		audioConnected = true;
 	}
 	visualizer = {};
@@ -897,7 +898,6 @@ function audioVisualizer () {
 			case "fft": {
 				if (gui.canvas && video.videoHeight * video.videoWidth < 16 && audio.paused == false) {
 					canvasCleared = false;
-					gui.ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
 					gui.ctx.clearRect(0, 0, gui.canvas.width, gui.canvas.height);
 					audioFloatData = new Uint8Array(audioAnl.frequencyBinCount);
 					audioAnl.getByteFrequencyData(audioFloatData);
@@ -910,13 +910,42 @@ function audioVisualizer () {
 					}
 					shrunkAudioData.forEach((e, i) => {
 						gui.ctx.fillStyle = "#ff0";
-						gui.ctx.fillRect(i * barWidth, gui.canvas.height * (1 - shrunkAudioData[i]), barWidth, gui.canvas.height * shrunkAudioData[i]);
+						gui.ctx.fillRect(i * barWidth, gui.canvas.height * (1 - e), barWidth, gui.canvas.height * e);
 					});
 					gui.ctx.font = "16px Verdana";
 					gui.ctx.textAlign = "end";
-					gui.ctx.fillText("FW:" + frequencyWidth.toString(), gui.canvas.width - 1, 36);
+					gui.ctx.fillText("1024-" + frequencyWidth.toString() + "Hz", gui.canvas.width - 1, 36);
 				}
-			}
+				break;
+			};
+			case "fft-f": {
+				if (gui.canvas && video.videoHeight * video.videoWidth < 16 && audio.paused == false) {
+					canvasCleared = false;
+					gui.ctx.clearRect(0, 0, gui.canvas.width, gui.canvas.height);
+					audioFloatData = new Float32Array(audioAnl.frequencyBinCount);
+					audioAnl.getFloatFrequencyData(audioFloatData);
+					frequencyDivision = 2 ** Math.floor(Math.log2(gui.canvas.width / 4));
+					frequencyWidth = 1024 / frequencyDivision;
+					barWidth = gui.canvas.width / frequencyDivision;
+					shrunkAudioData = [];
+					for (let ze = 0; ze < frequencyDivision; ze ++) {
+						shrunkAudioData[shrunkAudioData.length] = Math.round((Math.max(...Array.from(audioFloatData.slice(frequencyWidth * ze, frequencyWidth * (ze + 1) - 1))) - audioAnl.minDecibels) / (audioAnl.maxDecibels - audioAnl.minDecibels) * 1000) / 1000;
+					}
+					shrunkAudioData.forEach((e, i) => {
+						if (e >= 0) {
+							gui.ctx.fillStyle = "#ff0";
+							gui.ctx.fillRect(i * barWidth, gui.canvas.height * (1 - e), barWidth, gui.canvas.height * e);
+						} else {
+							gui.ctx.fillStyle = "#0b0";
+							gui.ctx.fillRect(i * barWidth, 0, barWidth, gui.canvas.height * (0 - e));
+						};
+					});
+					gui.ctx.font = "16px Verdana";
+					gui.ctx.textAlign = "end";
+					gui.ctx.fillText("1024-" + frequencyWidth.toString() + "Hz", gui.canvas.width - 1, 36);
+				}
+				break;
+			};
 		}
 	}
 }
