@@ -1,104 +1,108 @@
 <!DOCTYPE html>
 <head>
-      <meta charset="utf-8" http-equiv="200 OK"/>
-      <meta content="true" name="HandheldFriendly"/>
-      <meta content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" name="viewport"/>
-      <link href="css/core.css" rel="stylesheet"/>
-      <link href="img/icon.png" rel="shortcut icon"/>
-      <script src="libs/elsl.pre1.js">
-      </script>
-      <script src="libs/elsl.media.subtitles.js">
-      </script>
-      <script src="libs/crypto.js">
-      </script>
-      <script src="libs/sha1.js">
-      </script>
-      <script src="js/core.js">
-      </script>
-      <title>
-            WebMP DR28
-      </title>
+	<meta charset="utf-8" http-equiv="200 OK"/>
+	<meta content="true" name="HandheldFriendly"/>
+	<meta content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" name="viewport"/>
+	<link href="css/core.css" rel="stylesheet"/>
+	<link href="img/icon.png" rel="shortcut icon"/>
+	<script src="libs/elsl.pre1.js"> </script>
+	<script src="libs/elsl.media.subtitles.js"></script>
+	<script src="libs/crypto.js"></script>
+	<script src="libs/sha1.js"></script>
+	<script src="libs/base64.min.js"></script>
+	<script src="libs/enc-base64.js"></script>
+	<script src="libs/enc-utf8.js"></script>
+	<script src="libs/enc-utf16.js"></script>
+	<script src="libs/jsmediatags.min.js"></script>
+	<script src="js/core.js"></script>
+	<title>WebMP DR28</title>
 </head>
 <body>
-      <div abs="        " class="background video-container" id="vid-win">
-            <canvas id="audio-visualizer"></canvas>
-            <video></video>
-            <audio>
-            </audio>
-            <audio id="notify">
-            </audio>
-            <div id="vid-mask">
-                  <div id="subtitle">
-                  </div>
-                  <div id="play-if-ok">
-                        <img src="img/play.png"/>
-                  </div>
-                  <div id="loading-anime">
-                  </div>
-            </div>
-            <div id="topbar">
-                  <div id="FPS" style="left:2px;font-size:16px;line-height:24px;">
-                        32FPS
-                  </div>
-                  <div id="title" style="left:50%;transform:translate(-50%,0);font-size:16px;top:2px;line-height:24px;">
-                        test.mp4
-                  </div>
-                  <div id="battery">
-                  </div>
-                  <div id="time">
-                        00:00:00
-                  </div>
-            </div>
-            <div id="bottom">
-                  <div abs="" class="plainbtn" id="playbtn" style="display: none;">
-                        <img src="img/play.png"/>
-                  </div>
-                  <div abs="" class="plainbtn" id="pausebtn" style="display: none;">
-                        <img src="img/pause.png"/>
-                  </div>
-                  <div id="status">
-                  </div>
-                  <div id="time-now">
-                        00:00
-                  </div>
-                  <div id="time-all">
-                        00:00
-                  </div>
-                  <div id="time-bar">
-                        <div id="time-played">
-                        </div>
-                  </div>
-                  <div>
-                        <img id="volume" src="img/muted.png" style="width: 24px; height: 24px; left: 66px; top: 20px; filter: invert(100%);"/>
-                        <div id="volumeshow" onmousedown="shift = 0;" style="left: 92px; top: 22px;">
-                        </div>
-                        <div id="volumeback">
-                              <div id="volumebar">
-                              </div>
-                        </div>
-                  </div>
-                  <div>
-                        <img src="img/playbackSpeed.png" style="width: 24px; height: 24px; left: 144px; top: 20px; filter: invert(100%);"/>
-                        <div id="speed" style="left: 170px; top: 22px;">
-                              x1.0
-                        </div>
-                  </div>
-                  <div id="sub">
-                        OPEN
-                  </div>
-            </div>
-            <input id="subfbtn" type="file"/>
-      </div>
-      <div class="menu">
-            <ul>
-            </ul>
-      </div>
-      <div id="volumepanel" style="display:none;">
-            <div id="volume-btn-minus" onclick="volume(1 + shift)" style="font-size: 54px;">
-                  -
-            </div>
-            <div id="volume-btn-plus" onclick="volume(2 + shift)" style="font-size: 54px;">
-                  +
-            </div>
-      </div>
+	<div abs="	  " class="background video-container" id="vid-win">
+		<canvas id="audio-visualizer"></canvas>
+		<video></video>
+		<audio>
+		</audio>
+		<audio id="notify">
+		</audio>
+		<div id="vid-mask">
+			<div id="media-info">
+				<img></img>
+				<div class="splitter"></div>
+				<div id="media-info-artist">Artist: $1</div>
+				<div id="media-info-album">Album: $1</div>
+				<div id="media-info-title">Title: $1</div>
+			</div>
+			<div id="subtitle">
+			</div>
+			<div id="play-if-ok">
+				<img src="img/play.png"/>
+			</div>
+			<div id="loading-anime"></div>
+		</div>
+		<div id="topbar">
+			<div id="FPS" style="left:2px;font-size:16px;line-height:24px;">
+				32FPS
+			</div>
+			<div id="title" style="left:50%;transform:translate(-50%,0);font-size:16px;top:2px;line-height:24px;">
+				test.mp4
+			</div>
+			<div id="battery">
+			</div>
+			<div id="time">
+				00:00:00
+			</div>
+		</div>
+		<div id="bottom">
+			<div abs="" class="plainbtn" id="playbtn" style="display: none;">
+				<img src="img/play.png"/>
+			</div>
+			<div abs="" class="plainbtn" id="pausebtn" style="display: none;">
+				<img src="img/pause.png"/>
+			</div>
+			<div id="status">
+			</div>
+			<div id="time-now">
+				00:00
+			</div>
+			<div id="time-all">
+				00:00
+			</div>
+			<div id="time-bar">
+				<div id="time-played">
+				</div>
+			</div>
+			<div>
+				<img id="volume" src="img/muted.png" style="width: 24px; height: 24px; left: 66px; top: 20px; filter: invert(100%);"/>
+				<div id="volumeshow" onmousedown="shift = 0;" style="left: 92px; top: 22px;">
+				</div>
+				<div id="volumeback">
+					<div id="volumebar">
+					</div>
+				</div>
+			</div>
+			<div>
+				<img src="img/playbackSpeed.png" style="width: 24px; height: 24px; left: 144px; top: 20px; filter: invert(100%);"/>
+				<div id="speed" style="left: 170px; top: 22px;">
+					x1.0
+				</div>
+			</div>
+			<div id="sub">
+				OPEN
+			</div>
+		</div>
+		<input id="subfbtn" type="file"/>
+	</div>
+	<div class="menu">
+		<ul>
+		</ul>
+	</div>
+	<div id="volumepanel" style="display:none;">
+		<div id="volume-btn-minus" onclick="volume(1 + shift)" style="font-size: 54px;">
+			-
+		</div>
+		<div id="volume-btn-plus" onclick="volume(2 + shift)" style="font-size: 54px;">
+			+
+		</div>
+	</div>
 </body>
