@@ -254,6 +254,18 @@ function refresherThreadFunc() {
 			battery.innerHTML = "<span style=\"color:#fff;\">[" + mediaMode + "] </span>" + Math.round(batteryAPI.level * 100).toString() + "% " + lang.discharging;
 		}
 	}
+	if (gui.mediaInfo && video.videoWidth < 4 && audio.readyState > 0) {
+		if (window.visualizerMode) {
+			if (visualizerMode.toLowerCase() == "empty") {
+				gui.mediaInfo.style.display = "block";
+				gui.mediaInfo.artist.innerHTML = lang.miArtist + mediaInfo.tags.artist;
+				gui.mediaInfo.album.innerHTML = lang.miAlbum + mediaInfo.tags.album;
+				gui.mediaInfo.mtitle.innerHTML = lang.miTitle + mediaInfo.tags.title;
+			}
+		}
+	} else {
+		gui.mediaInfo.style.display = "none";
+	}
 }
 // Document loader
 document.onreadystatechange = function() {
@@ -314,6 +326,10 @@ document.onreadystatechange = function() {
 		gui.canvas.height = gui.canvas.clientHeight;
 		gui.vidMask = document.getElementById("vid-mask");
 		gui.ctx = gui.canvas.getContext("2d");
+		gui.mediaInfo = document.querySelector("#media-info");
+		gui.mediaInfo.artist = document.querySelector("#media-info #media-info-artist");
+		gui.mediaInfo.album = document.querySelector("#media-info #media-info-album");
+		gui.mediaInfo.mtitle = document.querySelector("#media-info #media-info-title");
 		mediaMode = "S";
 		// Force zero volume
 		video.muted = true;
@@ -741,6 +757,19 @@ function loadBlobMedia(files) {
 			vcs = [blobMedia.name];
 			video.src = blobURL;
 			audio.src = blobURL;
+			mediaInfo = undefined;
+			if (window.jsmediatags && files[count].type.indexOf("audio") == 0) {
+				new jsmediatags.Reader(blobMedia).read({
+					onSuccess: (e) => {
+						mediaInfo = e;
+						console.log(e);
+					},
+					onError: (e) => {
+						mediaInfo = undefined;
+						console.error(e.stack);
+					}
+				});
+			};
 			analyzeAudio();
 		} else if (files[count].type == "") {
 			let fileName = files[count].name;
@@ -794,6 +823,18 @@ function loadURLMedia(url, name = lang.defaultTitle) {
 				blobURL = URL.createObjectURL(blobMedia);
 				video.src = blobURL;
 				audio.src = blobURL;
+				if (window.jsmediatags) {
+					new jsmediatags.Reader(blobMedia).read({
+						onSuccess: (e) => {
+							mediaInfo = e;
+							console.log(e);
+						},
+						onError: (e) => {
+							mediaInfo = undefined;
+							console.error(e.stack);
+						}
+					});
+				};
 				analyzeAudio();
 			};
 		}
@@ -833,7 +874,6 @@ analyzeAudio = function () {
 		audioAnl = audioCxt.createAnalyser();
 		audioChannels = audioCxt.createChannelSplitter(audioMedia.channelCount);
 		audioMedia.connect(audioAnl);
-		audioAnl.minDecibels = -130;
 		audioConnected = true;
 	}
 	visualizer = {};
@@ -930,7 +970,7 @@ function audioVisualizer () {
 					barWidth = gui.canvas.width / frequencyDivision;
 					shrunkAudioData = [];
 					for (let ze = 0; ze < frequencyDivision; ze ++) {
-						shrunkAudioData[shrunkAudioData.length] = Math.round((Math.max(...Array.from(audioFloatData.slice(frequencyWidth * ze, frequencyWidth * (ze + 1) - 1))) - audioAnl.minDecibels) / (audioAnl.maxDecibels - audioAnl.minDecibels) * 1000) / 1000;
+						shrunkAudioData[shrunkAudioData.length] = Math.round((Math.max(...Array.from(audioFloatData.slice(frequencyWidth * ze, frequencyWidth * (ze + 1) - 1))) + 130) * 10) / 1000;
 					}
 					shrunkAudioData.forEach((e, i) => {
 						if (e >= 0) {
@@ -979,7 +1019,10 @@ if (window.navigator) {
 					"defaultTitle": "无标题媒体",
 					"loadingBlob": "获取网络资源中",
 					"audioVisualizerStarted": "音频可视化模块已启动",
-					"choose2dVisualizer": "请选择2D可视化效果"
+					"choose2dVisualizer": "请选择2D可视化效果",
+					"miArtist": "艺术家 : ",
+					"miAlbum": "专辑 : ",
+					"miTitle": "标题 : "
 				}
 				break;
 			case "zh-tw":
@@ -1006,7 +1049,10 @@ if (window.navigator) {
 					"defaultTitle": "無標題檔案",
 					"loadingBlob": "獲取網路檔案中",
 					"audioVisualizerStarted": "音聲可視化模塊已裝載",
-					"choose2dVisualizer": "請選擇2D可視化效果"
+					"choose2dVisualizer": "請選擇2D可視化效果",
+					"miArtist": "藝術家 : ",
+					"miAlbum": "專輯 : ",
+					"miTitle": "標題 : "
 				};
 				break;
 			default:
@@ -1031,7 +1077,10 @@ if (window.navigator) {
 					"defaultTitle": "Unknown media",
 					"loadingBlob": "Fetching online content",
 					"audioVisualizerStarted": "Started audio visualizer",
-					"choose2dVisualizer": "Please choose a 2D visualizer"
+					"choose2dVisualizer": "Please choose a 2D visualizer",
+					"miArtist": "Artist : ",
+					"miAlbum": "Album : ",
+					"miTitle": "title : "
 				}
 		}
 	}
