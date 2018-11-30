@@ -19,20 +19,31 @@
 </head>
 <body>
 	<div abs="	  " class="background video-container" id="vid-win">
+		<img id="playback-img"></img>
 		<canvas id="audio-visualizer"></canvas>
+		<div id="media-info">
+			<img></img>
+			<table>
+				<tr id="media-info-artist">
+					<td>Artist</td>
+					<td></td>
+				</tr>
+				<tr id="media-info-album">
+					<td>Album</td>
+					<td></td>
+				</tr>
+				<tr id="media-info-title">
+					<td>Title</td>
+					<td></td>
+				</tr>
+			</table>
+		</div>
 		<video></video>
 		<audio>
 		</audio>
 		<audio id="notify">
 		</audio>
 		<div id="vid-mask">
-			<div id="media-info">
-				<img></img>
-				<div class="splitter"></div>
-				<div id="media-info-artist">Artist: $1</div>
-				<div id="media-info-album">Album: $1</div>
-				<div id="media-info-title">Title: $1</div>
-			</div>
 			<div id="subtitle">
 			</div>
 			<div id="play-if-ok">
