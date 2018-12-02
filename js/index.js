@@ -12,7 +12,6 @@ wmpResizeWindow = function () {
 		wmpDisplay.style.height = (innerHeight - 48).toString() + "px";
 	}
 }
-
 // Hide tabs
 hideAllTabs = function () {
 	let count = 0;
@@ -23,6 +22,23 @@ hideAllTabs = function () {
 	};
 	wmpPlayerCore.style.display = "";
 	wmpPlayerCore.style.filter = "blur(2px)";
+}
+// Full screen
+function toggleFullScreen() {
+	let fullScreenElement = document.webkitFullscreenElement || document.mozFullscreenElement || document.fullscreenElement;
+	if (fullScreenElement) {
+		if (document.mozExitFullscreen) {
+			document.mozExitFullscreen();
+		} else {
+			document.webkitExitFullscreen();
+		};
+	} else {
+		if (document.body.webkitRequestFullscreen) {
+			document.body.webkitRequestFullscreen();
+		} else {
+			document.body.mozRequestFullscreen();
+		};
+	};
 }
 
 // Load document
@@ -99,6 +115,10 @@ document.addEventListener("readystatechange", function () {
 							break;
 						}
 					};
+					break;
+				};
+				case "fullSc": {
+					toggleFullScreen();
 					break;
 				};
 			}

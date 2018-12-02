@@ -254,16 +254,23 @@ function refresherThreadFunc() {
 			battery.innerHTML = "<span style=\"color:#fff;\">[" + mediaMode + "] </span>" + Math.round(batteryAPI.level * 100).toString() + "% " + lang.discharging;
 		}
 	}
+	// Media info table
 	if (gui.mediaInfo && video.videoWidth < 4 && audio.readyState > 0) {
 		if (window.visualizerMode) {
 			if (visualizerMode.toLowerCase() != "osc-xy") {
 				gui.mediaInfo.style.display = "block";
 				gui.mediaInfo.artist.children[0].innerHTML = lang.miArtist;
-				gui.mediaInfo.artist.children[1].innerHTML = mediaInfo.tags.artist.toString().replace("undefined", "Unknown");
 				gui.mediaInfo.album.children[0].innerHTML = lang.miAlbum;
-				gui.mediaInfo.album.children[1].innerHTML = mediaInfo.tags.album.toString().replace("undefined", "Unknown");
 				gui.mediaInfo.mtitle.children[0].innerHTML = lang.miTitle;
-				gui.mediaInfo.mtitle.children[1].innerHTML =  mediaInfo.tags.title.toString().replace("undefined", "Unknown");
+				if (window.mediaInfo) {
+					gui.mediaInfo.artist.children[1].innerHTML = mediaInfo.tags.artist || lang.unknown;
+					gui.mediaInfo.album.children[1].innerHTML = mediaInfo.tags.album || lang.unknown;
+					gui.mediaInfo.mtitle.children[1].innerHTML =  mediaInfo.tags.title || lang.unknown;
+				} else {
+					gui.mediaInfo.artist.children[1].innerHTML = lang.unknown;
+					gui.mediaInfo.album.children[1].innerHTML = lang.unknown;
+					gui.mediaInfo.mtitle.children[1].innerHTML = lang.unknown;
+				}
 			} else {
 				gui.mediaInfo.style.display = "none";
 			}
@@ -271,8 +278,9 @@ function refresherThreadFunc() {
 	} else {
 		gui.mediaInfo.style.display = "none";
 	}
-	// document.querySelector("#playback-img")
 	let imgP = document.querySelector("#playback-img");
+	gui.mediaInfo.table = gui.mediaInfo.querySelector("table");
+	gui.mediaInfo.image = gui.mediaInfo.querySelector("img");
 	if (imgP.naturalWidth / imgP.naturalHeight > innerWidth / innerHeight) {
 		imgP.style.width = innerHeight / imgP.naturalHeight * imgP.naturalWidth + "px";
 		imgP.style.height = "";
@@ -280,7 +288,17 @@ function refresherThreadFunc() {
 		imgP.style.height = innerWidth / imgP.naturalWidth * imgP.naturalHeight + "px";
 		imgP.style.width = "";
 	}
-	// Media info table
+	// Picture resize
+	if (innerWidth < 635) {
+		let autoResizeParam = [Math.floor((innerWidth - 10) * 0.4), innerHeight - gui.mediaInfo.table.clientHeight];
+		gui.mediaInfo.image.style.height = Math.min(...autoResizeParam).toString() + "px";
+		gui.mediaInfo.image.style.width = Math.min(...autoResizeParam).toString() + "px";
+		gui.mediaInfo.table.style.maxWidth = Math.min(...autoResizeParam).toString() + "px";
+	} else {
+		gui.mediaInfo.image.style.height = "";
+		gui.mediaInfo.image.style.width = "";
+		gui.mediaInfo.table.style.maxWidth = "";
+	}
 }
 // Document loader
 document.onreadystatechange = function() {
@@ -402,22 +420,7 @@ document.onreadystatechange = function() {
 			gui.subfbtn.click();
 		}
 		gui.subfbtn.oninput = function() {
-			let file = this.files[0];
-			if (file.name) {
-				let fileRead = new FileReader();
-				fileRead.onloadend = function() {
-					if (this.error) {
-						notify.push("sound/error.aac");
-						gui.status.push(lang.subReadError);
-					}
-					else {
-						subt = new Subtitles(this.result);
-						subt.import.srt();
-						console.log(subt);
-					}
-				}
-				fileRead.readAsText(file);
-			}
+			loadBlobMedia(this.files);
 		}
 		// Notification sounds
 		notify.push = function(sound) {
@@ -601,6 +604,7 @@ document.onreadystatechange = function() {
 		// Key responder
 		document.body.onkeydown = function(e) {
 			console.log(e.which);
+			let keyReturn = false;
 			switch (e.which) {
 				case 32:
 					// Space
@@ -611,12 +615,27 @@ document.onreadystatechange = function() {
 					else {
 						video.pause();
 						audio.pause();
-					}
+					};
+					break;
+				case 80:
+					if (e.ctrlKey) {
+						if (video.paused) {
+							video.play();
+							audio.play();
+						}
+						else {
+							video.pause();
+							audio.pause();
+						};
+					};
 					break;
 				case 13:
 					// Enter
 					gui.status.push(lang.useFs);
-					notify.push("sound/notify.aac")
+					notify.push("sound/notify.aac");
+					window.parent.postMessage({
+						"type": "fullSc"
+					}, "*");
 					break;
 				case 37:
 					// Left arrow
@@ -635,12 +654,28 @@ document.onreadystatechange = function() {
 					volume(1 + shift);
 					break;
 				case 79:
-					// O key
+					// Ctrl + O
 					if (e.ctrlKey) {
 						gui.subfbtn.click();
-						break;
+					};
+					break;
+				case 73:
+					// Ctrl + Shift + I
+					if (e.ctrlKey && e.shiftKey) {
+						keyReturn = true;
 					}
-			}
+					break;
+				case 123:
+					// F12
+					keyReturn = true;
+					break;
+				case 77:
+					// Ctrl + M
+					if (e.ctrlKey) {
+						audio.muted = !(audio.muted);
+					};
+			};
+			return keyReturn;
 		}
 		// Alternative menu
 		document.oncontextmenu = function() {
@@ -795,6 +830,8 @@ function loadBlobMedia(files) {
 					onError: (e) => {
 						mediaInfo = undefined;
 						console.error(e.stack);
+						document.querySelector("#media-info img").src = "img/defaultIcon.jpg";
+						document.querySelector("#playback-img").src = "img/defaultBackground.jpg";
 					}
 				});
 			};
@@ -873,6 +910,8 @@ function loadURLMedia(url, name = lang.defaultTitle) {
 						onError: (e) => {
 							mediaInfo = undefined;
 							console.error(e.stack);
+							document.querySelector("#media-info img").src = "img/defaultIcon.jpg";
+							document.querySelector("#playback-img").src = "img/defaultBackground.jpg";
 						}
 					});
 				};
@@ -1061,9 +1100,10 @@ if (window.navigator) {
 					"loadingBlob": "获取网络资源中",
 					"audioVisualizerStarted": "音频可视化模块已启动",
 					"choose2dVisualizer": "请选择2D可视化效果",
-					"miArtist": "艺术家 : ",
-					"miAlbum": "专辑 : ",
-					"miTitle": "标题 : "
+					"miArtist": "艺术家",
+					"miAlbum": "专辑",
+					"miTitle": "标题",
+					"unknown": "未知"
 				}
 				break;
 			case "zh-tw":
@@ -1091,9 +1131,10 @@ if (window.navigator) {
 					"loadingBlob": "獲取網路檔案中",
 					"audioVisualizerStarted": "音聲可視化模塊已裝載",
 					"choose2dVisualizer": "請選擇2D可視化效果",
-					"miArtist": "藝術家 : ",
-					"miAlbum": "專輯 : ",
-					"miTitle": "標題 : "
+					"miArtist": "藝術家",
+					"miAlbum": "專輯",
+					"miTitle": "標題",
+					"unknown": "未知"
 				};
 				break;
 			default:
@@ -1119,9 +1160,10 @@ if (window.navigator) {
 					"loadingBlob": "Fetching online content",
 					"audioVisualizerStarted": "Started audio visualizer",
 					"choose2dVisualizer": "Please choose a 2D visualizer",
-					"miArtist": "Artist : ",
-					"miAlbum": "Album : ",
-					"miTitle": "title : "
+					"miArtist": "Artist",
+					"miAlbum": "Album",
+					"miTitle": "title",
+					"unknown": "Unknown"
 				}
 		}
 	}
