@@ -238,9 +238,9 @@ progress {
 }
 
 #media-info img {
-	width: 256px;
-	height: 256px;
-	left: 25%;
+	width: 250px;
+	height: 250px;
+	left: 20%;
 	top: 35%;
 	border: none;
 	background: rgba(255, 255, 255, 0.2);
@@ -272,28 +272,20 @@ progress {
 #media-info table {
 	position: absolute;
 	text-align: center;
-	left: 25%;
+	left: 20%;
 	top: 75%;
 	opacity: 0.6;
 	transform: translate(-50%, -50%);
-	border: 1px solid #fff;
+	background: rgba(0, 0, 0, 0.5);
+	outline: 1px solid #fff;
+	max-width: 250px;
 }
 
 #media-info table tr {
 	transform: translate(0%, 0%);
 }
 
-#media-info-artist {
-	bottom: 50%;
-	transform: translate(-50%, -50%);
-}
-
-#media-info-album {
-	top: 50%;
-	transform: translate(-50%, -50%);
-}
-
-#media-info-title {
-	top: 50%;
-	transform: translate(-50%, 50%);
+#media-info table td {
+	border: 1px solid #fff;
+	padding: 4px 6px;
 }
