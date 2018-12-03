@@ -822,7 +822,7 @@ function loadBlobMedia(files) {
 							document.querySelector("#media-info img").src = mediaPicture;
 							document.querySelector("#playback-img").src = mediaPicture;
 						} else {
-							document.querySelector("#media-info img").src = "img/defaultIcon.jpg";
+							document.querySelector("#media-info img").src = "img/defaultIcon.png";
 							document.querySelector("#playback-img").src = "img/defaultBackground.jpg";
 						}
 						console.log(e);
@@ -830,7 +830,7 @@ function loadBlobMedia(files) {
 					onError: (e) => {
 						mediaInfo = undefined;
 						console.error(e.stack);
-						document.querySelector("#media-info img").src = "img/defaultIcon.jpg";
+						document.querySelector("#media-info img").src = "img/defaultIcon.png";
 						document.querySelector("#playback-img").src = "img/defaultBackground.jpg";
 					}
 				});
@@ -902,7 +902,7 @@ function loadURLMedia(url, name = lang.defaultTitle) {
 								document.querySelector("#media-info img").src = mediaPicture;
 								document.querySelector("#playback-img").src = mediaPicture;
 							} else {
-								document.querySelector("#media-info img").src = "img/defaultIcon.jpg";
+								document.querySelector("#media-info img").src = "img/defaultIcon.png";
 								document.querySelector("#playback-img").src = "img/defaultBackground.jpg";
 							}
 							console.log(e);
@@ -910,8 +910,8 @@ function loadURLMedia(url, name = lang.defaultTitle) {
 						onError: (e) => {
 							mediaInfo = undefined;
 							console.error(e.stack);
-							document.querySelector("#media-info img").src = "img/defaultIcon.jpg";
-							document.querySelector("#playback-img").src = "img/defaultBackground.jpg";
+							document.querySelector("#media-info img").src = "img/defaultIcon.png";
+							document.querySelector("#playback-img").src = "img/defaultBackground.png";
 						}
 					});
 				};

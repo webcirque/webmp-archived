@@ -7,6 +7,7 @@ document.addEventListener("readystatechange", function () {
 				unsupported.remove();
 				firefox.remove();
 			} else if (window.firefox || navigator.userAgent.search("Firefox") != -1) {
+				unsupported.remove();
 				firefox.style = "display:block";
 				document.querySelector("#firefox-notice button").onclick = () => {
 					firefox.remove();
