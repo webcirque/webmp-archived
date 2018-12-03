@@ -24,6 +24,7 @@ div[id^=settings-] {
 	top: 0;
 	left: 0;
 	position: absolute;
+	font-size: 16px;
 }
 
 div.item {
@@ -31,6 +32,7 @@ div.item {
 	border-top: 1px solid #fff;
 	margin: 0;
 	padding: 4px 6px;
+	font-size: 16px;
 }
 
 ::selection {

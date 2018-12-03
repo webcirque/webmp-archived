@@ -276,9 +276,10 @@ progress {
 	top: 75%;
 	opacity: 0.6;
 	transform: translate(-50%, -50%);
-	background: rgba(0, 0, 0, 0.5);
+	background: rgba(0, 0, 0, 0.6);
 	outline: 1px solid #fff;
 	max-width: 250px;
+	text-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
 }
 
 #media-info table tr {
