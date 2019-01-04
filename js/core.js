@@ -1057,7 +1057,7 @@ function audioVisualizer () {
 							gui.ctx.fillStyle = "#ff0";
 							gui.ctx.fillRect(i * barWidth, gui.canvas.height * (1 - e), barWidth, gui.canvas.height * e);
 						} else {
-							gui.ctx.fillStyle = "#0b0";
+							gui.ctx.fillStyle = "#0e0";
 							gui.ctx.fillRect(i * barWidth, 0, barWidth, gui.canvas.height * (0 - e));
 						};
 					});

@@ -159,7 +159,7 @@ document.onreadystatechange = function () {
 						"data": "empty"
 					}
 				}, "*");
-				localStorage.setItem("WEBMPS:visualizer", "\"empty\"");
+				localStorage.setItem("WEBMPS:visualizer", "empty");
 			};
 			_q("#drawer-visualizer #text-visualizer-oscxy").onclick = () => {
 				window.parent.postMessage({
@@ -170,7 +170,7 @@ document.onreadystatechange = function () {
 						"data": "osc-xy"
 					}
 				}, "*");
-				localStorage.setItem("WEBMPS:visualizer", "\"osc-xy\"");
+				localStorage.setItem("WEBMPS:visualizer", "osc-xy");
 			};
 			_q("#drawer-visualizer #text-visualizer-fft").onclick = () => {
 				window.parent.postMessage({
@@ -181,7 +181,7 @@ document.onreadystatechange = function () {
 						"data": "fft"
 					}
 				}, "*");
-				localStorage.setItem("WEBMPS:visualizer", "\"fft\"");
+				localStorage.setItem("WEBMPS:visualizer", "fft");
 			};
 			_q("#drawer-visualizer #text-visualizer-fft-f").onclick = () => {
 				window.parent.postMessage({
@@ -192,7 +192,7 @@ document.onreadystatechange = function () {
 						"data": "fft-f"
 					}
 				}, "*");
-				localStorage.setItem("WEBMPS:visualizer", "\"fft-f\"");
+				localStorage.setItem("WEBMPS:visualizer", "fft-f");
 			};
 			break;
 		};
