@@ -47,6 +47,7 @@ if (!(window.Subtitles)) {
 			}
 			this.text = text;
 		}
+		this.metaInfo = {};
 		this.import = {
 			"srt": (text) => {
 				let cmdBegin = new Date();
@@ -133,7 +134,131 @@ if (!(window.Subtitles)) {
 			},
 			"lrc": (text) => {}
 		};
-		this.import.vtt = this.import.srt;
+		this.import.vtt = (text) => {
+			text = text.replace("WEBVTT\n","");
+			this.import.srt(text);
+		}
+		this.import.ass = (text) => {
+			text = text || this.text;
+			let assSturcture = {};
+			let assTotal = text.split("\n");
+			let assMode = "";
+			let assBlankLine = 0;
+			let assFormat = [];
+			let assEventFormat = [];
+			assTotal.forEach((e, i) => {
+				let assText = e.trim();
+				if (assText == "") {
+					assBlankLine ++;
+				} else {
+					switch (assText.toLowerCase()) {
+						case "[script info]": {
+							assSturcture.scriptInfo = i;
+							assMode = "info";
+							break;
+						};
+						case "[v4 styles]":
+						case "[v4+ styles]": {
+							assSturcture.styles = i;
+							assMode = "styles";
+							break;
+						};
+						case "[events]": {
+							assSturcture.events = i;
+							assMode = "events";
+							break;
+						};
+						case "[fonts]": {
+							assSturcture.fonts = i;
+							assMode = "fonts";
+							break;
+						};
+						case "[graphics]": {
+							assSturcture.graphics = i;
+							assMode = "graphics"
+							break;
+						};
+						default: {
+							switch (assMode) {
+								case "info": {
+									if (assText[0] != ";") {
+										let assDeclare = assText.split(":");
+										assDeclare.forEach((e, i) => {
+											assDeclare[i] = e.trim();
+										});
+										this.metaInfo[assDeclare[0]] = assDeclare[1];
+									}
+									break;
+								};
+								case "styles": {
+									if (assText[0] != ";") {
+										let assDeclare = assText.split(":");
+										assDeclare.forEach((e, i) => {
+											assDeclare[i] = e.trim();
+										});
+										if (assDeclare[0] == "Format") {
+											assFormat = assDeclare[1].split(",");
+											assFormat.forEach((e, i) => {
+												assFormat[i] = e.trim();
+											});
+										} else if (assDeclare[0] == "Style") {
+											// Style declaration
+										}
+									}
+									break;
+								};
+								case "events": {
+									if (assText[0] != ";") {
+										let assDeclare = assText.split(":");
+										assDeclare.forEach((e, i) => {
+											assDeclare[i] = e.trim();
+										});
+										if (assDeclare[0] == "Format") {
+											assEventFormat = assDeclare[1].split(",");
+											assEventFormat.forEach((e, i) => {
+												assEventFormat[i] = e.trim();
+											});
+										} else if (assDeclare[0] == "Dialogue") {
+											let assTrueText = assText.replace("Dialogue:", "").trim();
+											let assTrueDialogue = "";
+											let assTrueComma = assTrueText.split(",");
+											assTrueComma.forEach((e, i) => {
+												// Parse dialogue
+												if (i >= assEventFormat.length) {
+													assTrueDialogue += "," + e;
+												} else {
+													switch (assEventFormat[i].toLowerCase()) {
+														case "start": {
+															break;
+														};
+														case "end": {
+															break;
+														};
+														case "text": {
+															assTrueDialogue = e;
+															break;
+														};
+													}
+												}
+											});
+											/* while (assTrueDialogue.search("\\N") != -1 || assTrueDialogue.search("\\n") != -1) {
+												assTrueDialogue = assTrueDialogue.replace("\\N", "\n").replace("\\n", "\n");
+											} */
+											console.info(assTrueDialogue);
+										};
+									}
+									break;
+								};
+							}
+						}
+					};
+				}
+			});
+			if (window.debugMode) {
+				console.info("Structure: %o", assSturcture);
+			};
+			this.type = "ASS";
+		};
 		this.export = {
 			"srt": () => {},
 			"lrc": () => {}
