@@ -76,10 +76,23 @@ function refresherThreadFunc() {
 				let scnt = 0;
 				let subContent = "";
 				while (scnt < subList.length) {
-					while (subList[scnt].text.search("\n") != -1) {
-						subList[scnt].text = subList[scnt].text.replace("\n", "<br/>");
+					while (subList[scnt].text[0].text.search("\n") != -1) {
+						subList[scnt].text[0].text = subList[scnt].text[0].text.replace("\n", "<br/>");
 					}
-					subContent += "<span>" + subList[scnt].text + "</span><br/>";
+					let tempSubContent = "";
+					let tempBracketStack = 0;
+					Array.from(subList[scnt].text[0].text).forEach((e) => {
+						if (e == "{") {
+							tempBracketStack ++;
+						} else if (e == "}") {
+							tempBracketStack --;
+						} else {
+							if (tempBracketStack < 1) {
+								tempSubContent += e;
+							}
+						}
+					});
+					subContent += "<span>" + tempSubContent + "</span><br/>";
 					scnt ++;
 				}
 				gui.subtitle.innerHTML = subContent;
@@ -366,6 +379,13 @@ document.onreadystatechange = function() {
 		mediaMode = "S";
 		// Force zero volume
 		video.muted = true;
+		// Get volume buttons work!
+		volumeBtnUp.onclick = () => {
+			volume(2 + shift);
+		};
+		volumeBtnDown.onclick = () => {
+			volume(1 + shift);
+		};
 		// Default visualizer
 		visualizerMode = "empty";
 		visualizerModeList = ["empty", "osc-xy", "fft", "osc"];
@@ -854,7 +874,24 @@ function loadBlobMedia(files) {
 					};
 					fileRead.readAsText(files[count]);
 					break;
-				}
+				};
+				case "ass":
+				case "ssa": {
+					let fileRead = new FileReader();
+					fileRead.onloadend = function () {
+						if (this.error) {
+							notify.push("sound/error.aac");
+							gui.status.push(lang.subReadError);
+						}
+						else {
+							subt = new Subtitles(this.result);
+							subt.import.ass();
+							console.log(subt);
+						}
+					};
+					fileRead.readAsText(files[count]);
+					break;
+				};
 			}
 		}
 		count ++;
