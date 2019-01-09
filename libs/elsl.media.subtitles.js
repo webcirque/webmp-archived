@@ -1,6 +1,6 @@
 // Subtitle unit
 if (!(window.Subtitle)) {
-	Subtitle = function (start, end, text, prop) {
+	Subtitle = function (start = 0, end = 0, text = "") {
 		if (start.constructor == Number) {
 			if (start >= 0) {
 				this.start = start;
@@ -19,23 +19,21 @@ if (!(window.Subtitle)) {
 		} else {
 			throw(new TypeError("Invalid end time: must be a number"));
 		};
-		if (text.constructor == String) {
+		if (text.constructor == SubtitleContent) {
 			this.text = text;
 		} else {
-			throw(new TypeError("Invalid text: must be a string"));
-		};
-		if (prop.constructor == Object) {
-			this.prop = prop;
-		} else {
-			throw(new TypeError("Invalid property: must be an object"));
+			throw(new TypeError("Invalid text: must be a SubtitleContent"));
 		};
 	};
 };
 
 // Subtitle list
-class SubtitlesList extends Array {
-	
-}
+class SubtitlesList extends Array {}
+class SubtitleContent extends Array {}
+function SubtitleUnit (text = "", prop = {}) {
+	this.text = text;
+	this.prop = prop;
+};
 
 // Subtitles container
 if (!(window.Subtitles)) {
@@ -48,8 +46,13 @@ if (!(window.Subtitles)) {
 			this.text = text;
 		}
 		this.metaInfo = {};
+		this.globalStyles = {};
 		this.import = {
 			"srt": (text) => {
+				// Restore
+				this.metaInfo = {};
+				this.type = "";
+				this.globalStyles = {};
 				let cmdBegin = new Date();
 				text = text || this.text;
 				this.text = text;
@@ -119,7 +122,9 @@ if (!(window.Subtitles)) {
 							prop[propName] = propValue;
 							count ++;
 						};
-						this.list[this.list.length] = new Subtitle (start, end, subtext, prop);
+						let subCont = new SubtitleContent;
+						subCont.push(new SubtitleUnit(subtext, prop));
+						this.list[this.list.length] = new Subtitle (start, end, subCont);
 						this.type = "SRT";
 					} else {
 						throw(new Error("Invalid SRT text: timeline not found at item $1".replace("$1",donum + 1)));
@@ -139,6 +144,10 @@ if (!(window.Subtitles)) {
 			this.import.srt(text);
 		}
 		this.import.ass = (text) => {
+			// Restore
+				this.metaInfo = {};
+				this.type = "";
+				this.globalStyles = {};
 			text = text || this.text;
 			let assSturcture = {};
 			let assTotal = text.split("\n");
@@ -219,9 +228,11 @@ if (!(window.Subtitles)) {
 												assEventFormat[i] = e.trim();
 											});
 										} else if (assDeclare[0] == "Dialogue") {
-											let assTrueText = assText.replace("Dialogue:", "").trim();
+											let assTrueText = assText.replace("Dialogue:", "");
 											let assTrueDialogue = "";
 											let assTrueComma = assTrueText.split(",");
+											let assTrueStart = 0;
+											let assTrueEnd = 0;
 											assTrueComma.forEach((e, i) => {
 												// Parse dialogue
 												if (i >= assEventFormat.length) {
@@ -229,9 +240,17 @@ if (!(window.Subtitles)) {
 												} else {
 													switch (assEventFormat[i].toLowerCase()) {
 														case "start": {
+															assTrueStart = 0;
+															e.split(":").forEach((e, i, a) => {
+																assTrueStart += parseFloat(e) * (60 ** (a.length - 1 - i));
+															});
 															break;
 														};
 														case "end": {
+															assTrueEnd = 0;
+															e.split(":").forEach((e, i, a) => {
+																assTrueEnd += parseFloat(e) * (60 ** (a.length - 1 - i));
+															});
 															break;
 														};
 														case "text": {
@@ -241,10 +260,12 @@ if (!(window.Subtitles)) {
 													}
 												}
 											});
-											/* while (assTrueDialogue.search("\\N") != -1 || assTrueDialogue.search("\\n") != -1) {
-												assTrueDialogue = assTrueDialogue.replace("\\N", "\n").replace("\\n", "\n");
-											} */
-											console.info(assTrueDialogue);
+											while (assTrueDialogue.indexOf("\\N") > -1) {
+												assTrueDialogue = assTrueDialogue.replace("\\N","\n");
+											};
+											let tempSubCon = new SubtitleContent;
+											tempSubCon.push(new SubtitleUnit(assTrueDialogue, {}));
+											this.list[this.list.length] = new Subtitle(assTrueStart, assTrueEnd, tempSubCon);
 										};
 									}
 									break;
