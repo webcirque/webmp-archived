@@ -38,7 +38,7 @@ function dataSaverThreadFunc() {
 				}
 				let item = {
 					"currentTime": video.currentTime,
-					"currentVolume": audio.volume,
+					"currentVolume": audioGain.gain.value,
 					"offset": config.delay,
 					"currentPlaybackRate": audio.playbackRate,
 					"mediaInfo": {
@@ -50,7 +50,6 @@ function dataSaverThreadFunc() {
 					item.subtitle = subt.text;
 				}
 				if (window.mediaMode == "B") {
-					item.origin = blobURL;
 					item.mediaType = blobMedia.type;
 				} else if (window.mediaMode == "S") {
 					item.origin = video.currentSrc;
@@ -235,10 +234,10 @@ function refresherThreadFunc() {
 	}
 	window.parent.postMessage(exchangeData, "*");
 	// Volume icon
-	if (audio.volume > 0.6 && audio.muted == false) {
+	if (audioGain.gain.value > 0.6 && audio.muted == false) {
 		gui.volume.src = "img/volumeUp.png";
 	}
-	else if (audio.volume <= 0.6 && audio.muted == false && audio.volume != 0) {
+	else if (audioGain.gain.value <= 0.6 && audio.muted == false && audioGain.gain.value != 0) {
 		gui.volume.src = "img/volumeDown.png";
 	}
 	else {
@@ -250,7 +249,7 @@ function refresherThreadFunc() {
 	else {
 		gui.speed.innerHTML = "x" + video.playbackRate.toString();
 	}
-	gui.volume.show.innerHTML = Math.round(audio.volume * 100) + "%";
+	gui.volume.show.innerHTML = Math.round(audioGain.gain.value * 100) + "%";
 	// Battery
 	if (window.batteryAPI) {
 		if (batteryAPI.charging) {
@@ -377,6 +376,32 @@ document.onreadystatechange = function() {
 		gui.mediaInfo.album = document.querySelector("#media-info #media-info-album");
 		gui.mediaInfo.mtitle = document.querySelector("#media-info #media-info-title");
 		mediaMode = "S";
+		// Initialize audio environment
+		audioCxt = new AudioContext();
+		audioMedia = audioCxt.createMediaElementSource(audio);
+		globalAudioSource = "media";
+		audioBA = audioCxt.createBufferSource();
+		audioAnl = audioCxt.createAnalyser();
+		audioChannels = audioCxt.createChannelSplitter(2);
+		audioMerger = audioCxt.createChannelMerger(2);
+		audioGain = audioCxt.createGain();
+		audioDC = audioCxt.createDynamicsCompressor();
+		audioAnlArray = ["L", "R"];
+		audioAnlArray.forEach((e, i, a) => {
+			a[i] = audioCxt.createAnalyser();
+			a[i].fftSize = 1024;
+		});
+		// Connects to unprocessed audio
+		audioMedia.connect(audioDC);
+		audioDC.connect(audioGain);
+		audioGain.connect(audioCxt.destination);
+		// Enables FFT and FFT-F visualizers
+		audioMedia.connect(audioAnl);
+		// Enables OSC-XY
+		audioMedia.connect(audioChannels);
+		audioAnlArray.forEach((e, i) => {
+			audioChannels.connect(e, i);
+		});
 		// Force zero volume
 		video.muted = true;
 		// Get volume buttons work!
@@ -523,7 +548,7 @@ document.onreadystatechange = function() {
 		fps.curr = new Date();
 		// Load refresher
 		refresherThread = setInterval(refresherThreadFunc, 33.3);
-		visualizerThread = setInterval(audioVisualizer, 12.5);
+		visualizerThread = setInterval(audioVisualizer, 1/60);
 		// Load media
 		if (window.TabSearch) {
 			info = TabSearch(location.search);
@@ -565,7 +590,8 @@ document.onreadystatechange = function() {
 				clearInterval(refresherThread);
 				refresherThread = setInterval(refresherThreadFunc, 33.3);
 				console.log(lang.resourceRegained);
-			}
+			};
+			canvasAddDisconnect();
 		}
 		// Load progress
 		document.body.onmousedown = function() {
@@ -679,6 +705,11 @@ document.onreadystatechange = function() {
 						gui.subfbtn.click();
 					};
 					break;
+				case 85:
+					// Ctrl + U
+					if (e.ctrlKey) {
+						audioGain.gain.setValueAtTime(1, audioCxt.currentTime);
+					}
 				case 73:
 					// Ctrl + Shift + I
 					if (e.ctrlKey && e.shiftKey) {
@@ -694,6 +725,7 @@ document.onreadystatechange = function() {
 					if (e.ctrlKey) {
 						audio.muted = !(audio.muted);
 					};
+					break;
 			};
 			return keyReturn;
 		}
@@ -731,19 +763,19 @@ document.onreadystatechange = function() {
 // Volume public method
 function volume(action) {
 	if (action == 2) {
-		if (audio.volume < 0.99) {
-			audio.volume = (parseInt(gui.volume.show.innerHTML) + 1) / 100;
+		if (audioGain.gain.value < 1.99) {
+			audioGain.gain.setValueAtTime((parseInt(gui.volume.show.innerHTML) + 1) / 100, audioCxt.currentTime);
 		}
 		else {
-			audio.volume = 1;
+			audioGain.gain.setValueAtTime(2, audioCxt.currentTime);
 		}
 	}
 	else if (action == 1) {
-		if (audio.volume > 0.01) {
-			audio.volume = (parseInt(gui.volume.show.innerHTML) - 1) / 100;
+		if (audioGain.gain.value > 0.01) {
+			audioGain.gain.setValueAtTime((parseInt(gui.volume.show.innerHTML) - 1) / 100, audioCxt.currentTime);
 		}
 		else {
-			audio.volume = 0;
+			audioGain.gain.setValueAtTime(0, audioCxt.currentTime);
 			notify.push("sound/error.aac")
 		}
 	}
@@ -808,6 +840,46 @@ timeSt = function(time) {
 		return timestamp;
 	}
 }
+// Load Microphone
+function loadUserMedia() {
+	if (window.blobURL) {
+		// Clear previous blob
+		URL.revokeObjectURL(blobURL);
+		window.blobURL = undefined;
+	} else if (audio.srcObject || video.srcObject) {
+		video.srcObject = null;
+		audio.srcObject = null;
+	}
+	video.pause();
+	audio.pause();
+	blobMedia = new Blob;
+	blobMedia.name = lang.micInput;
+	if (window.navigator) {
+		if (navigator.mediaDevices) {
+			if (navigator.mediaDevices.getUserMedia) {
+				navigator.mediaDevices.getUserMedia({
+					audio: true,
+					video: false
+				}).then((mediaStream) => {
+					video.srcObject = mediaStream;
+					audio.srcObject = mediaStream;
+				}).catch((errorMsg) => {
+					throw(errorMsg);
+				});
+			}
+		} else if (navigator.getUserMedia) {
+			navigator.getUserMedia({
+				audio: true,
+				video: false
+			}).then((mediaStream) => {
+				video.srcObject = mediaStream;
+				audio.srcObject = mediaStream;
+			}).catch((errorMsg) => {
+				throw(errorMsg);
+			});
+		}
+	}
+}
 // Load Blob Media
 function loadBlobMedia(files) {
 	video.pause();
@@ -821,6 +893,9 @@ function loadBlobMedia(files) {
 				// Clear previous blob
 				URL.revokeObjectURL(blobURL);
 				window.blobURL = undefined;
+			} else if (audio.srcObject || video.srcObject) {
+				video.srcObject = null;
+				audio.srcObject = null;
 			}
 			blobMedia = files[count];
 			blobURL = URL.createObjectURL(blobMedia);
@@ -904,6 +979,9 @@ function loadURLMedia(url, name = lang.defaultTitle) {
 		URL.revokeObjectURL(blobURL);
 		window.blobURL = undefined;
 		window.blobMedia = undefined;
+	} else if (audio.srcObject || video.srcObject) {
+		video.srcObject = null;
+		audio.srcObject = null;
 	}
 	info.file = null;
 	URLMediaRequest = new XMLHttpRequest();
@@ -983,39 +1061,30 @@ function loadURLMedia(url, name = lang.defaultTitle) {
 // Audio
 analyzeAudio = function () {
 	if (!(window.audioConnected)) {
-		audioCxt = new AudioContext();
-		audioMedia = audioCxt.createMediaElementSource(audio);
-		audioSP = audioCxt.createScriptProcessor(512, audioMedia.channelCount, audioMedia.channelCount);
-		audioMedia.connect(audioSP);
-		audioSP.connect(audioCxt.destination);
-		audioAnl = audioCxt.createAnalyser();
-		audioChannels = audioCxt.createChannelSplitter(audioMedia.channelCount);
-		audioMedia.connect(audioAnl);
+		// For future sound effects
+		audioEqMatrix = [];
 		audioConnected = true;
 	}
 	visualizer = {};
 	visualizerLastFrame = timeSt(new Date);
 	visualizerCurrentFrame = timeSt(new Date);
-	audioSP.onaudioprocess = function (e) {
-		input = [];
-		output = [];
-		for (let za = 0; za < audioMedia.channelCount; za ++)  {
-			input[za] = e.inputBuffer.getChannelData(za);
-			output[za] = e.outputBuffer.getChannelData(za);
-			for (let zb = 0; zb < input[za].length; zb ++) {
-				output[za][zb] = input[za][zb];
-			}
-		}
-	}
 }
 // Audio Visualizer
 function audioVisualizer () {
 	if (!(window.inactive)) {
 		switch (visualizerMode.toLowerCase()) {
 			case "osc-xy": {
+				// Rewritten output
+				input = [];
+				audioAnlArray.forEach((e, i) => {
+					fad = new Float32Array(e.frequencyBinCount);
+					e.getFloatTimeDomainData(fad);
+					input[i] = fad;
+				});
+				// Visualizer core
 				if (gui.canvas && video.videoHeight * video.videoWidth < 16 && audio.paused == false) {
 					canvasCleared = false;
-					gui.ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
+					gui.ctx.fillStyle = "rgba(0, 0, 0, 0.37)";
 					gui.ctx.fillRect(0, 0, gui.canvas.width, gui.canvas.height);
 					gui.ctx.fillStyle = "#ff0";
 					if (window.audioCxt) {
@@ -1059,7 +1128,7 @@ function audioVisualizer () {
 					audioFloatData = new Uint8Array(audioAnl.frequencyBinCount);
 					audioAnl.getByteFrequencyData(audioFloatData);
 					frequencyDivision = 2 ** Math.floor(Math.log2(gui.canvas.width / 8));
-					frequencyWidth = 1024 / frequencyDivision;
+					frequencyWidth = audioAnl.frequencyBinCount / frequencyDivision;
 					barWidth = gui.canvas.width / frequencyDivision;
 					shrunkAudioData = [];
 					for (let ze = 0; ze < frequencyDivision; ze ++) {
@@ -1072,7 +1141,7 @@ function audioVisualizer () {
 					gui.ctx.font = "16px Verdana";
 					gui.ctx.textAlign = "end";
 					gui.ctx.fillStyle = "#ff0";
-					gui.ctx.fillText("1024-" + frequencyWidth.toString() + "Hz", gui.canvas.width - 1, 36);
+					gui.ctx.fillText(audioAnl.frequencyBinCount.toString() + "-" + frequencyWidth.toString() + "Hz", gui.canvas.width - 1, 36);
 				}
 				break;
 			};
@@ -1091,10 +1160,10 @@ function audioVisualizer () {
 					}
 					shrunkAudioData.forEach((e, i) => {
 						if (e >= 0) {
-							gui.ctx.fillStyle = "#ff0";
+							gui.ctx.fillStyle = "rgba(255, 255, 0, 0.5)";
 							gui.ctx.fillRect(i * barWidth, gui.canvas.height * (1 - e), barWidth, gui.canvas.height * e);
 						} else {
-							gui.ctx.fillStyle = "#0e0";
+							gui.ctx.fillStyle = "rgba(0, 239, 0, 0.5)";
 							gui.ctx.fillRect(i * barWidth, 0, barWidth, gui.canvas.height * (0 - e));
 						};
 					});
@@ -1106,6 +1175,17 @@ function audioVisualizer () {
 				break;
 			};
 		}
+	}
+}
+function canvasAddDisconnect() {
+	if (video.videoWidth == 0 && video.paused != true) {
+		gui.ctx.clearRect(gui.canvas.width / 2 - 120, gui.canvas.height / 2 - 20, 240, 40);
+		gui.ctx.strokeStyle = "#ff0";
+		gui.ctx.strokeRect(gui.canvas.width / 2 - 120, gui.canvas.height / 2 - 20, 240, 40);
+		gui.ctx.font = "16px Verdana";
+		gui.ctx.textAlign = "start";
+		gui.ctx.fillStyle = "#ff0";
+		gui.ctx.fillText("DISCONNECTED", gui.canvas.width / 2 - 68, gui.canvas.height / 2 + 6);
 	}
 }
 // Language
