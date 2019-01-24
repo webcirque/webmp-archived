@@ -4,13 +4,28 @@ addEventListener("message", function(e) {
 		case "info:gui": {
 			switch (e.data.specify) {
 				case "playBlobMedia": {
-					loadBlobMedia(e.data.data);
+					if (blobMedia.name == e.data.data.name && blobMedia.size == e.data.data.size && blobMedia.type == e.data.data.type) {
+						video.play();
+						audio.play();
+					} else {
+						loadBlobMedia([e.data.data], true, true);
+					}
 					break;
 				};
 				case "playURLMedia": {
 					loadURLMedia(e.data.data);
 					break;
 				};
+				case "controlPlay": {
+					video.play();
+					audio.play();
+					break;
+				};
+				case "controlPause": {
+					video.pause();
+					audio.pause();
+					break;
+				}
 			};
 			break;
 		};
@@ -23,6 +38,9 @@ addEventListener("message", function(e) {
 			};
 		};
 	};
+	if (window.debugMode) {
+		console.info(e.data);
+	}
 });
 // Data saving thread
 function dataSaverThreadFunc() {
@@ -103,6 +121,114 @@ function refresherThreadFunc() {
 			}
 		}
 	}
+	// Update the audio panel
+	if (window.audioMS) {
+		gui.connectMic.style.display = "none";
+	} else {
+		gui.connectMic.style.display = "";
+	};
+	if (!(window.audioPublicUsing)) {
+		let a = 0;
+		switch (activeTileId) {
+			case "audio-menu-volume": {
+				a = audioGain.gain.value;
+				break;
+			};
+			case "audio-menu-playback": {
+				a = audio.playbackRate;
+				break;
+			};
+			case "audio-menu-dyncompr": {
+				a = audioDC.threshold.value;
+				break;
+			};
+			case "audio-menu-mic": {
+				a = audioMSGain.gain.value;
+				break;
+			}
+		}
+		gui.audioMenuPublic.value = a;
+	}
+	gui.audioMenuPublic.onmousedown = () => {
+		audioPublicUsing = true;
+	};
+	gui.audioMenuPublic.onmouseup = () => {
+		audioPublicUsing = false;
+	};
+	gui.audioMenuNodes.forEach((e) => {
+		e.innerHTML = lang.audioMenuStrings[e.id];
+		let extraContent = "";
+		switch (e.id) {
+			case "audio-menu-volume": {
+				extraContent = Math.round(audioGain.gain.value * 100).toString() + "%";
+				e.onmouseup = () => {
+					gui.audioMenuPublic.value = audioGain.gain.value;
+					gui.audioMenuPublic.step = "0.01";
+					gui.audioMenuPublic.max = "2";
+					gui.audioMenuPublic.min = "0";
+					gui.audioMenuPublic.oninput = function () {
+						audioGain.gain.setValueAtTime(this.value, audioCxt.currentTime);
+					};
+				};
+				break;
+			};
+			case "audio-menu-playback": {
+				if (video.playbackRate % 1 == 0) {
+					extraContent = "x" + video.playbackRate + ".0";
+				} else {
+					extraContent = "x" + video.playbackRate;
+				};
+				e.onmouseup = () => {
+					gui.audioMenuPublic.value = audio.playbackRate;
+					gui.audioMenuPublic.step = "0.1";
+					gui.audioMenuPublic.max = "2";
+					gui.audioMenuPublic.min = "0.5";
+					gui.audioMenuPublic.oninput = function () {
+						video.playbackRate = this.value;
+						audio.playbackRate = this.value;
+					};
+				};
+				break;
+			};
+			case "audio-menu-dyncompr": {
+				extraContent = audioDC.threshold.value.toString() + "dB";
+				e.onmouseup = () => {
+					gui.audioMenuPublic.value = audioDC.threshold.value;
+					gui.audioMenuPublic.step = "1";
+					gui.audioMenuPublic.max = "-8";
+					gui.audioMenuPublic.min = "-72";
+					gui.audioMenuPublic.oninput = function () {
+						audioDC.threshold.setValueAtTime(this.value, audioCxt.currentTime);
+					};
+				};
+				break;
+			};
+			case "audio-menu-mic": {
+				extraContent = Math.round(audioMSGain.gain.value * 100).toString() + "%";
+				e.onmouseup = () => {
+					gui.audioMenuPublic.value = audioMSGain.gain.value;
+					gui.audioMenuPublic.step = "0.01";
+					gui.audioMenuPublic.max = "2";
+					gui.audioMenuPublic.min = "0";
+					gui.audioMenuPublic.oninput = function () {
+						audioMSGain.gain.setValueAtTime(this.value, audioCxt.currentTime);
+					};
+				};
+				break;
+			};
+		};
+		e.onclick = function () {
+			activeTileId = this.id;
+		}
+		if (e.id == activeTileId && e.className.indexOf("audio-menu-tile") != -1) {
+			e.className = "audio-menu-tile audio-menu-active";
+		} else if (e.id == "audio-menu-title") {
+			e.className = "audio-menu-title";
+		} else {
+			e.className = "audio-menu-tile";
+		}
+		e.innerHTML += extraContent;
+	});
 	// Show time
 	let currentMin = Math.floor(video.currentTime / 60).toString();
 	while (currentMin.length < 2) {
@@ -222,7 +348,7 @@ function refresherThreadFunc() {
 		"type": "info:player-core",
 		"title": document.title,
 		"currentTime": video.currentTime,
-		"duration": video.duration
+		"duration": video.duration,
 	};
 	if (window.info) {
 		if (info.src) {
@@ -231,8 +357,23 @@ function refresherThreadFunc() {
 		if (info.start) {
 			exchangeData.start = info.start;
 		}
-	}
+	};
+	if (window.blobMedia) {
+		exchangeData.media = blobMedia;
+	};
 	window.parent.postMessage(exchangeData, "*");
+	// Ready to develop playlist
+	video.onended = () => {
+		if (video.videoHeight == 0 && video.videoWidth == 0) {
+			window.parent.postMessage({
+				"type": "forward:playlist",
+				"data": {
+					"specify": "commonAnnounce",
+					"data": "mediaEnded"
+				}
+			}, "*");
+		}
+	};
 	// Volume icon
 	if (audioGain.gain.value > 0.6 && audio.muted == false) {
 		gui.volume.src = "img/volumeUp.png";
@@ -305,7 +446,10 @@ function refresherThreadFunc() {
 		let autoResizeParam = [Math.floor((innerWidth - 10) * 0.4), innerHeight - gui.mediaInfo.table.clientHeight];
 		gui.mediaInfo.image.style.height = Math.min(...autoResizeParam).toString() + "px";
 		gui.mediaInfo.image.style.width = Math.min(...autoResizeParam).toString() + "px";
-		gui.mediaInfo.table.style.maxWidth = Math.min(...autoResizeParam).toString() + "px";
+		gui.mediaInfo.table.style.maxWidth = Math.max(...autoResizeParam).toString() + "px";
+		if (innerWidth < innerHeight) {
+			gui.mediaInfo.table.style.maxWidth = Math.min(...autoResizeParam).toString() + "px";
+		}
 	} else {
 		gui.mediaInfo.image.style.height = "";
 		gui.mediaInfo.image.style.width = "";
@@ -343,6 +487,7 @@ document.onreadystatechange = function() {
 		fps = document.getElementById("FPS");
 		btn = {};
 		gui = {};
+		activeTileId = "";
 		btn.play = document.getElementById("playbtn");
 		btn.pause = document.getElementById("pausebtn");
 		gui.title = document.getElementById("title");
@@ -375,7 +520,14 @@ document.onreadystatechange = function() {
 		gui.mediaInfo.artist = document.querySelector("#media-info #media-info-artist");
 		gui.mediaInfo.album = document.querySelector("#media-info #media-info-album");
 		gui.mediaInfo.mtitle = document.querySelector("#media-info #media-info-title");
+		gui.audioMenu = document.getElementById("audio-menu");
+		gui.dcbtn = document.getElementById("dcshow");
+		gui.audioMenuNodes = document.querySelectorAll("#audio-menu p");
+		gui.audioMenuPublic = document.querySelector("#audio-menu input");
+		gui.connectMic = document.querySelector("#connect-mic");
 		mediaMode = "S";
+		// Prepare for microphone connect
+		gui.connectMic.innerHTML = lang.audioMenuStrings["connect-mic"];
 		// Initialize audio environment
 		audioCxt = new AudioContext();
 		audioMedia = audioCxt.createMediaElementSource(audio);
@@ -386,6 +538,7 @@ document.onreadystatechange = function() {
 		audioMerger = audioCxt.createChannelMerger(2);
 		audioGain = audioCxt.createGain();
 		audioDC = audioCxt.createDynamicsCompressor();
+		audioMSGain = audioCxt.createGain();
 		audioAnlArray = ["L", "R"];
 		audioAnlArray.forEach((e, i, a) => {
 			a[i] = audioCxt.createAnalyser();
@@ -402,6 +555,12 @@ document.onreadystatechange = function() {
 		audioAnlArray.forEach((e, i) => {
 			audioChannels.connect(e, i);
 		});
+		// Connect Microphone
+		gui.connectMic.onclick = loadUserMedia;
+		// Actions for audio menu
+		document.querySelector("#audio-menu img.close-button").onclick = function () {
+			this.parentElement.style.display = "none";
+		}
 		// Force zero volume
 		video.muted = true;
 		// Get volume buttons work!
@@ -459,7 +618,8 @@ document.onreadystatechange = function() {
 			}, "*");
 			
 			return false;
-		}
+		};
+		// When audio finished playing
 		// Subtitles loader
 		gui.sub.onclick = function() {
 			gui.subfbtn.click();
@@ -490,6 +650,10 @@ document.onreadystatechange = function() {
 		gui.speed.onmousedown = function () {
 			shift = 2;
 		};
+		// Audio panel
+		gui.dcbtn.addEventListener("click", function() {
+			gui.audioMenu.style.display = "block";
+		});
 		// Click to seek
 		gui.timeNow.onclick = function() {
 			if (video.currentTime >= 10) {
@@ -726,6 +890,21 @@ document.onreadystatechange = function() {
 						audio.muted = !(audio.muted);
 					};
 					break;
+				case 82:
+					// Ctrl + R
+					if (e.ctrlKey) {
+						if (window.mediaInfo) {
+							if (mediaInfo.tags) {
+								if (mediaInfo.tags.picture) {
+									let tempAnchor = document.createElement("a");
+									tempAnchor.href = document.querySelector("div#media-info img").src;
+									tempAnchor.download = mediaInfo.tags.artist + " - " + mediaInfo.tags.album + mediaInfo.tags.picture.format.replace("image/", ".");
+									tempAnchor.click();
+									tempAnchor.remove();
+								}
+							}
+						}
+					}
 			};
 			return keyReturn;
 		}
@@ -842,18 +1021,6 @@ timeSt = function(time) {
 }
 // Load Microphone
 function loadUserMedia() {
-	if (window.blobURL) {
-		// Clear previous blob
-		URL.revokeObjectURL(blobURL);
-		window.blobURL = undefined;
-	} else if (audio.srcObject || video.srcObject) {
-		video.srcObject = null;
-		audio.srcObject = null;
-	}
-	video.pause();
-	audio.pause();
-	blobMedia = new Blob;
-	blobMedia.name = lang.micInput;
 	if (window.navigator) {
 		if (navigator.mediaDevices) {
 			if (navigator.mediaDevices.getUserMedia) {
@@ -861,8 +1028,9 @@ function loadUserMedia() {
 					audio: true,
 					video: false
 				}).then((mediaStream) => {
-					video.srcObject = mediaStream;
-					audio.srcObject = mediaStream;
+					audioMS = audioCxt.createMediaStreamSource(mediaStream);
+					audioMS.connect(audioMSGain);
+					audioMSGain.connect(audioDC);
 				}).catch((errorMsg) => {
 					throw(errorMsg);
 				});
@@ -872,8 +1040,9 @@ function loadUserMedia() {
 				audio: true,
 				video: false
 			}).then((mediaStream) => {
-				video.srcObject = mediaStream;
-				audio.srcObject = mediaStream;
+				audioMS = audioCxt.createMediaStreamSource(mediaStream);
+				audioMS.connect(audioMSGain);
+				audioMSGain.connect(audioDC);
 			}).catch((errorMsg) => {
 				throw(errorMsg);
 			});
@@ -881,7 +1050,7 @@ function loadUserMedia() {
 	}
 }
 // Load Blob Media
-function loadBlobMedia(files) {
+function loadBlobMedia(files, isFromPlaylist = false, willPlayWhenFinish = false) {
 	video.pause();
 	audio.pause();
 	info.file = null;
@@ -898,11 +1067,29 @@ function loadBlobMedia(files) {
 				audio.srcObject = null;
 			}
 			blobMedia = files[count];
+			if (files[count].type.indexOf("video") == 0) {
+				gui.ctx.clearRect(0, 0, gui.canvas.width, gui.canvas.height);
+				document.querySelector("#media-info img").src = false;
+				document.querySelector("#playback-img").src = false;
+			}
+			if (isFromPlaylist == false && files[count].type.indexOf("audio") == 0) {
+				window.parent.postMessage({
+					"type": "forward:playlist",
+					"data": {
+						"specify": "addBlobMedia",
+						"data": blobMedia
+					}
+				}, "*");
+			};
 			blobURL = URL.createObjectURL(blobMedia);
 			vcs = [blobMedia.name];
 			video.src = blobURL;
 			audio.src = blobURL;
 			mediaInfo = undefined;
+			if (willPlayWhenFinish) {
+				video.play();
+				audio.play();
+			};
 			if (window.jsmediatags && files[count].type.indexOf("audio") == 0) {
 				new jsmediatags.Reader(blobMedia).read({
 					onSuccess: (e) => {
@@ -913,7 +1100,7 @@ function loadBlobMedia(files) {
 							e.tags.picture.data.forEach((f) => {
 								mediaPicture += String.fromCharCode(f);
 							});
-							mediaPicture = "data:" + e.tags.picture.type + ";base64," + btoa(mediaPicture);
+							mediaPicture = "data:" + e.tags.picture.format + ";base64," + btoa(mediaPicture);
 							document.querySelector("#media-info img").src = mediaPicture;
 							document.querySelector("#playback-img").src = mediaPicture;
 						} else {
@@ -1160,7 +1347,7 @@ function audioVisualizer () {
 					}
 					shrunkAudioData.forEach((e, i) => {
 						if (e >= 0) {
-							gui.ctx.fillStyle = "rgba(255, 255, 0, 0.5)";
+							gui.ctx.fillStyle = "rgba(255, 255, 0, 1)";
 							gui.ctx.fillRect(i * barWidth, gui.canvas.height * (1 - e), barWidth, gui.canvas.height * e);
 						} else {
 							gui.ctx.fillStyle = "rgba(0, 239, 0, 0.5)";
@@ -1220,7 +1407,18 @@ if (window.navigator) {
 					"miArtist": "艺术家",
 					"miAlbum": "专辑",
 					"miTitle": "标题",
-					"unknown": "未知"
+					"unknown": "未知",
+					"audioMenuStrings": {
+						"audio-menu-title": "混音板",
+						"audio-menu-volume": "媒体音量：",
+						"audio-menu-mic": "麦克风音量：",
+						"audio-menu-playback": "播放速度：",
+						"audio-menu-dyncompr": "防破音声响上限：",
+						"audio-menu-eqbass": "均衡器低频部分：",
+						"audio-menu-eqvocal": "均衡器中频部分：",
+						"audio-menu-eqtreble": "均衡器高频部分：",
+						"connect-mic": "连接麦克风"
+					}
 				}
 				break;
 			case "zh-tw":
@@ -1251,7 +1449,18 @@ if (window.navigator) {
 					"miArtist": "藝術家",
 					"miAlbum": "專輯",
 					"miTitle": "標題",
-					"unknown": "未知"
+					"unknown": "未知",
+					"audioMenuStrings": {
+						"audio-menu-title": "調音板",
+						"audio-menu-volume": "媒體音量：",
+						"audio-menu-mic": "話筒音量：",
+						"audio-menu-playback": "回放速度：",
+						"audio-menu-dyncompr": "防破音聲級上限：",
+						"audio-menu-eqbass": "均衡器低頻部分：",
+						"audio-menu-eqvocal": "均衡器中頻部分：",
+						"audio-menu-eqtreble": "均衡器高頻部分：",
+						"connect-mic": "連接話筒"
+					}
 				};
 				break;
 			default:
@@ -1280,7 +1489,18 @@ if (window.navigator) {
 					"miArtist": "Artist",
 					"miAlbum": "Album",
 					"miTitle": "title",
-					"unknown": "Unknown"
+					"unknown": "Unknown",
+					"audioMenuStrings": {
+						"audio-menu-title": "Audio Mixing Panel",
+						"audio-menu-volume": "Media Volume：",
+						"audio-menu-mic": "Mic Volume：",
+						"audio-menu-playback": "Playback Rate：",
+						"audio-menu-dyncompr": "Compressor：",
+						"audio-menu-eqbass": "EQ Bass：",
+						"audio-menu-eqvocal": "EQ Vocal：",
+						"audio-menu-eqtreble": "EQ Treble：",
+						"connect-mic": "Connect Mic"
+					}
 				}
 		}
 	}

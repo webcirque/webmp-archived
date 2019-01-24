@@ -50,16 +50,25 @@ document.addEventListener("readystatechange", function () {
 		wmpDisplay = document.getElementById("display");
 		wmpPlayerCore = document.getElementById("player-core");
 		wmpSettingsTab = document.getElementById("settings-tab");
+		wmpPlaylistTab = document.getElementById("playlist-tab");
 		window.onresize = wmpResizeWindow;
 		wmpResizeWindow();
 		// Receive data
 		addEventListener("message", function (ev) {
+			granted = true;
 			switch (ev.data.type.split(":")[0]) {
 				case "info": {
 					switch (ev.data.type) {
 						case "info:player-core": {
+							granted = false;
 							coreData = ev.data;
 							document.title = coreData.title;
+							if (coreData.media) {
+								wmpPlaylistTab.contentWindow.postMessage({
+									"specify": "nowPlayingMedia",
+									"data": coreData.media
+								}, "*");
+							};
 						};
 						default: {
 						}
@@ -70,9 +79,15 @@ document.addEventListener("readystatechange", function () {
 					switch (ev.data.type) {
 						case "forward:player-core": {
 							wmpPlayerCore.contentWindow.postMessage(ev.data.data, "*");
+							break;
 						};
 						case "forward:settings": {
 							wmpSettingsTab.contentWindow.postMessage(ev.data.data, "*");
+							break;
+						};
+						case "forward:playlist": {
+							wmpPlaylistTab.contentWindow.postMessage(ev.data.data, "*");
+							break;
 						};
 					}
 					break;
@@ -86,7 +101,7 @@ document.addEventListener("readystatechange", function () {
 					switch (ev.data.type) {
 						case "jump:settings": {
 							hideAllTabs();
-							wmpMenuBar.btnList[5].className = "tab-item-active";
+							wmpMenuBar.btnList[3].className = "tab-item-active";
 							document.getElementById("settings-tab").style.display = "";
 						};
 					}
@@ -122,7 +137,7 @@ document.addEventListener("readystatechange", function () {
 					break;
 				};
 			}
-			if (window.debugMode) {
+			if (window.debugMode && window.granted) {
 				console.info(ev.data);
 			}
 		});
@@ -149,19 +164,7 @@ document.addEventListener("readystatechange", function () {
 		});
 		wmpMenuBar.btnList[3].addEventListener("mouseup", function () {
 			hideAllTabs();
-			document.getElementById("history-tab").style.display = "";
-		});
-		wmpMenuBar.btnList[4].addEventListener("mouseup", function () {
-			hideAllTabs();
-			document.getElementById("search-tab").style.display = "";
-		});
-		wmpMenuBar.btnList[5].addEventListener("mouseup", function () {
-			hideAllTabs();
 			document.getElementById("settings-tab").style.display = "";
-		});
-		wmpMenuBar.btnList[wmpMenuBar.btnList.length - 1].addEventListener("mouseup", function () {
-			hideAllTabs();
-			document.getElementById("info-tab").style.display = "";
 		});
 		wmpMenuBar.btnList[1].addEventListener("mouseup", function () {
 			hideAllTabs();
