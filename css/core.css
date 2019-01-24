@@ -125,6 +125,11 @@ video {
 	position: relative;
 	height: 100%;
 	background: #ff0;
+	transition: background 0.1s, width 0.1s;
+}
+
+#time-played:active, #time-bar:active #time-played {
+	background: #0f0;
 }
 
 progress {
@@ -289,4 +294,97 @@ progress {
 #media-info table td {
 	border: 1px solid #fff;
 	padding: 4px 6px;
+}
+
+#audio-menu {
+	width: 60%;
+	height: 60%;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	min-width: 300px;
+	min-height: 300px;
+	background-color: rgba(0, 0, 0, 0.3);
+	border: 0 solid;
+	border-radius: 4px;
+	box-shadow: 0 0 4px 2px rgba(0, 0, 0, 0.5);
+	display: none;
+	color: #fff;
+}
+
+#audio-menu-public {
+	position: absolute;
+	outline: none;
+	color: rgba(0,0,0,0);
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	background: rgba(255, 255, 0, 0);
+	border: 2px solid #ff0;
+	border-radius: 10px;
+	width: 82%;
+	bottom: 32px;
+	left: 50%;
+	transform: translate(-50%, 0);
+	transition: background 0.2s;
+}
+
+#audio-menu-public:hover {
+	background: rgba(255, 255, 0, 0.1);
+}
+
+#audio-menu-public:active {
+	background: rgba(255, 255, 0, 0.2);
+}
+
+#audio-menu-public::-webkit-slider-thumb {
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	width: 16px;
+	height: 16px;
+	border: 2px solid #fff;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.9);
+	transition: background 0.2s;
+}
+
+#audio-menu-public::-webkit-slider-thumb:active {
+	background: rgba(255, 255, 255, 0);
+}
+
+.close-button {
+	filter: invert(100%); width: 24px; height: 24px;
+	transform: rotate(0deg);
+	transition: transform 0.6s;
+}
+
+.close-button:hover {
+	transform: rotate(90deg);
+}
+
+p.audio-menu-tile {
+	background: transparent;
+	box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.4);
+	border: 0 solid;
+	border-radius: 4px;
+	transition: background 0.2s, box-shadow 0.2s;
+	margin: 8px 0 0 8px;
+	padding: 4px;
+	float: left;
+}
+
+p.audio-menu-tile:hover {
+	background: rgba(255, 255, 255, 0.2);
+	box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+}
+
+p.audio-menu-active {
+	background: rgba(255, 255, 255, 0.4);
+	box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+}
+
+#connect-mic {
+	right: 8px;
+	bottom: 64px;
 }
