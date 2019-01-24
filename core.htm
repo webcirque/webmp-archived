@@ -98,15 +98,30 @@
 					x1.0
 				</div>
 			</div>
+			<div>
+				<img src="img/dynamicCompressor.png" style="width: 24px; height: 24px; left: 270px; top: 20px; filter: invert(100%);"/>
+				<div id="dcshow" style="left: 296px; top: 22px;">
+					-24dB
+				</div>
+			</div>
 			<div id="sub">
 				OPEN
 			</div>
 		</div>
 		<input id="subfbtn" type="file"/>
 	</div>
-	<div class="menu">
-		<ul>
-		</ul>
+	<div id="audio-menu">
+		<img class="close-button" src="img/close.png" style="position: absolute; top: 8px; right: 8px;" />
+		<p class="audio-menu-title" id="audio-menu-title" style="font-size:20px; margin: 0; height: 28px; line-height: 28px; background: #000;">lang.audioMixingMenu</p>
+		<p class="audio-menu-tile" id="audio-menu-volume">lang.mediaVolume</p>
+		<p class="audio-menu-tile" id="audio-menu-mic">lang.micVolume</p>
+		<p class="audio-menu-tile" id="audio-menu-playback">lang.speed</p>
+		<p class="audio-menu-tile" id="audio-menu-dyncompr">lang.dynamicCompressThreshold</p>
+		<p class="audio-menu-tile" id="audio-menu-eqbass">lang.equalizerLowFreq</p>
+		<p class="audio-menu-tile" id="audio-menu-eqvocal">lang.equalizerMediumFreq</p>
+		<p class="audio-menu-tile" id="audio-menu-eqtreble">lang.equalizerHighFreq</p>
+		<div id="connect-mic">lang.connectMicrophone</div>
+		<input id="audio-menu-public" type="range" min="0" max="1" step="0.001" value="0"></input>
 	</div>
 	<div id="volumepanel" style="display:none;">
 		<div id="volume-btn-minus" style="font-size: 54px;">

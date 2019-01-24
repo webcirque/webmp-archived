@@ -1,7 +1,7 @@
 {
 	"name": "Webcirque WebMP 0.28",
 	"short_name": "WebMP 0.28",
-	"version": "0.28.20190104",
+	"version": "0.28.20190124",
 	"manifest_version": 2,
 	"description": "__MSG_extDescription__",
 	"icons": {
