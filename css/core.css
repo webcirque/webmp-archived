@@ -125,7 +125,7 @@ video {
 	position: relative;
 	height: 100%;
 	background: #ff0;
-	transition: background 0.1s, width 0.1s;
+	transition: background 0.1s;
 }
 
 #time-played:active, #time-bar:active #time-played {
@@ -198,7 +198,7 @@ progress {
 }
 
 #battery {
-	line-height: 24px;
+	line-height: 22px;
 	right: 2px;
 }
 
