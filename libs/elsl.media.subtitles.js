@@ -53,6 +53,7 @@ if (!(window.Subtitles)) {
 				this.metaInfo = {};
 				this.type = "";
 				this.globalStyles = {};
+				this.list = new SubtitlesList();
 				let cmdBegin = new Date();
 				text = text || this.text;
 				this.text = text;
@@ -125,7 +126,7 @@ if (!(window.Subtitles)) {
 						let subCont = new SubtitleContent;
 						subCont.push(new SubtitleUnit(subtext, prop));
 						this.list[this.list.length] = new Subtitle (start, end, subCont);
-						this.type = "SRT";
+						this.type = "srt";
 					} else {
 						throw(new Error("Invalid SRT text: timeline not found at item $1".replace("$1",donum + 1)));
 					}
@@ -145,9 +146,9 @@ if (!(window.Subtitles)) {
 		}
 		this.import.ass = (text) => {
 			// Restore
-				this.metaInfo = {};
-				this.type = "";
-				this.globalStyles = {};
+			this.metaInfo = {};
+			this.type = "";
+			this.globalStyles = {};
 			text = text || this.text;
 			let assSturcture = {};
 			let assTotal = text.split("\n");
@@ -278,7 +279,62 @@ if (!(window.Subtitles)) {
 			if (window.debugMode) {
 				console.info("Structure: %o", assSturcture);
 			};
-			this.type = "ASS";
+			this.type = "ass";
+		};
+		this.import.lrc = (text) => {
+			if (text == null || text == undefined) {
+				text = this.text;
+			};
+			this.list = new SubtitlesList();
+			// Restore
+			this.metaInfo = {};
+			this.type = "";
+			this.globalStyles = {};
+			let lrcLines = text.split("\n");
+			let tempLyrics = [];
+			lrcLines.forEach((e, i) => {
+				let realLrcLine = Array.from(e.trim());
+				if (realLrcLine[0] = "[") {
+					// Valid line
+					let lyrics = "";
+					let announce = "";
+					let lyricsStarted = 0;
+					realLrcLine.forEach((char) => {
+						if (char == "]") {
+							lyricsStarted --;
+						} else if (char == "[") {
+							lyricsStarted ++;
+						} else if (lyricsStarted == 0) {
+							lyrics += char;
+						} else {
+							announce += char;
+						};
+					});
+					if (announce.search(/[A-Za-z,;! ]/) == -1) {
+						// Annouce time
+						let timeArr = announce.split(":");
+						let timeStart = 0;
+						timeArr.forEach((n, p) => {
+							let num = parseInt(n);
+							timeStart += n * (60 ** (timeArr.length - 1 - p));
+						});
+						tempLyrics.push(new Subtitle(timeStart, 0, new SubtitleContent(new SubtitleUnit(lyrics, {}))));
+					} else {
+						// Anounce information
+					};
+					tempLyrics.forEach((unit, index, origin) => {
+						if (index < origin.length - 1) {
+							unit.end = origin[index + 1].start;
+						} else {
+							unit.end = Infinity;
+						};
+						this.list.push(unit);
+					});
+					this.type = "lrc";
+				} else {
+					throw(new Error("Invalid LRC declare at line $1".replace("$1", i + 1)));
+				};
+			});
 		};
 		this.export = {
 			"srt": () => {},
