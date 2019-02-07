@@ -19,6 +19,6 @@
 	},
 	"homepage_url": "https://pwcq.ml/",
 	"permissions": [
-		"cookies", "geolocation", "notifications", "storage", "unlimitedStorage", "http://*/*", "https://*/*"
+		"cookies", "geolocation", "notifications", "storage", "unlimitedStorage", "http://*/*", "https://*/*", "http://localhost/*"
 	]
 }
