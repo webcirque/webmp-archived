@@ -170,6 +170,9 @@ document.addEventListener("readystatechange", function () {
 			hideAllTabs();
 			wmpPlayerCore.style.filter = "";
 		});
+		wmpMenuBar.btnList[1].addEventListener("contextmenu", function () {
+			toggleFullScreen();
+		});
 		// Pass information to core
 		// Pass search queries
 		if (window.TabSearch) {
@@ -184,7 +187,9 @@ document.addEventListener("readystatechange", function () {
 				}
 				wmpPlayerCorePath += "start=" + wmpPassParam.start;
 			}
-			wmpPlayerCore.src = wmpPlayerCorePath;
+			if (JSON.stringify(wmpPassParam) != "{\"\":\"undefined\"}") {
+				wmpPlayerCore.src = wmpPlayerCorePath;
+			}
 		}
 		// Pass file info
 		document.body.addEventListener("dragenter", function (e) {

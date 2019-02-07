@@ -1,4 +1,7 @@
-﻿// Message
+﻿// Constants
+const fpsRange = [60, 58, 56, 54, 52, 50, 48, 46, 44, 42, 40, 38, 36, 34, 32, 30, 28, 26, 24, 22, 20, 18, 16, 14, 12, 10];
+
+// Message
 addEventListener("message", function(e) {
 	switch (e.data.type) {
 		case "info:gui": {
@@ -66,6 +69,7 @@ function dataSaverThreadFunc() {
 				}
 				if (window.subt) {
 					item.subtitle = subt.text;
+					item.subtitleType = subt.type;
 				}
 				if (window.mediaMode == "B") {
 					item.mediaType = blobMedia.type;
@@ -81,46 +85,8 @@ function dataSaverThreadFunc() {
 		}
 	}
 }
-// Refresher thread
-function refresherThreadFunc() {
-	// Subtitle Sync
-	if (window.subt) {
-		// Will be using elsl.media.subtitles.render
-		// But use basic first
-		if (window.Subtitles) {
-			if (window.subt) {
-				subList = subt.currentSub(audio.currentTime);
-				let scnt = 0;
-				let subContent = "";
-				while (scnt < subList.length) {
-					while (subList[scnt].text[0].text.search("\n") != -1) {
-						subList[scnt].text[0].text = subList[scnt].text[0].text.replace("\n", "<br/>");
-					}
-					let tempSubContent = "";
-					let tempBracketStack = 0;
-					Array.from(subList[scnt].text[0].text).forEach((e) => {
-						if (e == "{") {
-							tempBracketStack ++;
-						} else if (e == "}") {
-							tempBracketStack --;
-						} else {
-							if (tempBracketStack < 1) {
-								tempSubContent += e;
-							}
-						}
-					});
-					subContent += "<span>" + tempSubContent + "</span><br/>";
-					scnt ++;
-				}
-				gui.subtitle.innerHTML = subContent;
-				let subSize = Math.round((innerWidth * innerHeight) / 921600 * 24 * 2) / 2;
-				if (subSize < 12) {
-					subSize = 12;
-				}
-				gui.subtitle.style.fontSize = subSize.toString() + "px";
-			}
-		}
-	}
+// Audio Panel thread
+function audioPanelThreadFunc() {
 	// Update the audio panel
 	if (window.audioMS) {
 		gui.connectMic.style.display = "none";
@@ -145,7 +111,27 @@ function refresherThreadFunc() {
 			case "audio-menu-mic": {
 				a = audioMSGain.gain.value;
 				break;
-			}
+			};
+			case "audio-menu-eqstart": {
+				a = audioEQArray[0].gain.value
+				break;
+			};
+			case "audio-menu-eqbass": {
+				a = audioEQArray[1].gain.value
+				break;
+			};
+			case "audio-menu-eqvocal": {
+				a = audioEQArray[2].gain.value
+				break;
+			};
+			case "audio-menu-eqtreble": {
+				a = audioEQArray[3].gain.value
+				break;
+			};
+			case "audio-menu-eqstop": {
+				a = audioEQArray[4].gain.value
+				break;
+			};
 		}
 		gui.audioMenuPublic.value = a;
 	}
@@ -196,7 +182,7 @@ function refresherThreadFunc() {
 					gui.audioMenuPublic.value = audioDC.threshold.value;
 					gui.audioMenuPublic.step = "1";
 					gui.audioMenuPublic.max = "-8";
-					gui.audioMenuPublic.min = "-72";
+					gui.audioMenuPublic.min = "-100";
 					gui.audioMenuPublic.oninput = function () {
 						audioDC.threshold.setValueAtTime(this.value, audioCxt.currentTime);
 					};
@@ -208,10 +194,75 @@ function refresherThreadFunc() {
 				e.onmouseup = () => {
 					gui.audioMenuPublic.value = audioMSGain.gain.value;
 					gui.audioMenuPublic.step = "0.01";
-					gui.audioMenuPublic.max = "2";
+					gui.audioMenuPublic.max = "4";
 					gui.audioMenuPublic.min = "0";
 					gui.audioMenuPublic.oninput = function () {
 						audioMSGain.gain.setValueAtTime(this.value, audioCxt.currentTime);
+					};
+				};
+				break;
+			};
+			case "audio-menu-eqstart": {
+				extraContent = audioEQArray[0].gain.value.toString() + "dB";
+				e.onmouseup = () => {
+					gui.audioMenuPublic.value = audioEQArray[0].gain.value;
+					gui.audioMenuPublic.step = "0";
+					gui.audioMenuPublic.max = "15";
+					gui.audioMenuPublic.min = "-35";
+					gui.audioMenuPublic.oninput = function () {
+						audioEQArray[0].gain.setValueAtTime(this.value, audioCxt.currentTime);
+					};
+				};
+				break;
+			};
+			case "audio-menu-eqbass": {
+				extraContent = audioEQArray[1].gain.value.toString() + "dB";
+				e.onmouseup = () => {
+					gui.audioMenuPublic.value = audioEQArray[1].gain.value;
+					gui.audioMenuPublic.step = "0";
+					gui.audioMenuPublic.max = "15";
+					gui.audioMenuPublic.min = "-35";
+					gui.audioMenuPublic.oninput = function () {
+						audioEQArray[1].gain.setValueAtTime(this.value, audioCxt.currentTime);
+					};
+				};
+				break;
+			};
+			case "audio-menu-eqvocal": {
+				extraContent = audioEQArray[2].gain.value.toString() + "dB";
+				e.onmouseup = () => {
+					gui.audioMenuPublic.value = audioEQArray[2].gain.value;
+					gui.audioMenuPublic.step = "0";
+					gui.audioMenuPublic.max = "15";
+					gui.audioMenuPublic.min = "-35";
+					gui.audioMenuPublic.oninput = function () {
+						audioEQArray[2].gain.setValueAtTime(this.value, audioCxt.currentTime);
+					};
+				};
+				break;
+			};
+			case "audio-menu-eqtreble": {
+				extraContent = audioEQArray[3].gain.value.toString() + "dB";
+				e.onmouseup = () => {
+					gui.audioMenuPublic.value = audioEQArray[3].gain.value;
+					gui.audioMenuPublic.step = "0";
+					gui.audioMenuPublic.max = "15";
+					gui.audioMenuPublic.min = "-35";
+					gui.audioMenuPublic.oninput = function () {
+						audioEQArray[3].gain.setValueAtTime(this.value, audioCxt.currentTime);
+					};
+				};
+				break;
+			};
+			case "audio-menu-eqstop": {
+				extraContent = audioEQArray[4].gain.value.toString() + "dB";
+				e.onmouseup = () => {
+					gui.audioMenuPublic.value = audioEQArray[4].gain.value;
+					gui.audioMenuPublic.step = "0";
+					gui.audioMenuPublic.max = "15";
+					gui.audioMenuPublic.min = "-35";
+					gui.audioMenuPublic.oninput = function () {
+						audioEQArray[4].gain.setValueAtTime(this.value, audioCxt.currentTime);
 					};
 				};
 				break;
@@ -229,6 +280,80 @@ function refresherThreadFunc() {
 		}
 		e.innerHTML += extraContent;
 	});
+}
+// Visualizer framerate changer thread
+function visualizerShiftingFunc() {
+	let fpsAvg = 303;
+	fpsAvgDiff = 0;
+	fpsHistory.forEach((e) => {
+		fpsAvgDiff += Math.abs(e - fpsAvg);
+	});
+	fpsAvgDiff /= fpsHistory.length;
+	let fpsIndex = fpsRange.indexOf(visualizerFPS);
+	if (!(window.inactive)) {
+		if (fpsAvgDiff > 60) {
+			if (fpsIndex < fpsRange.length - 1) {
+				// Decrease FPS
+				clearInterval(visualizerThread);
+				let shiftedFPS = fpsRange[fpsIndex + 1];
+				visualizerThread = setInterval(audioVisualizer, 1000 / shiftedFPS);
+				visualizerFPS = shiftedFPS;
+				fpsHistory = new Uint16Array(visualizerFPS / 2);
+			}
+		} else if (fpsAvgDiff < 36) {
+			if (fpsIndex != 0) {
+				// Increase FPS
+				clearInterval(visualizerThread);
+				let shiftedFPS = fpsRange[fpsIndex - 1];
+				visualizerThread = setInterval(audioVisualizer, 1000 / shiftedFPS);
+				visualizerFPS = shiftedFPS;
+				fpsHistory = new Uint16Array(visualizerFPS / 2);
+			}
+		}
+	}
+}
+// GUI Refresher thread
+function refresherThreadFunc() {
+	// Subtitle Sync
+	if (window.subt) {
+		// Will be using elsl.media.subtitles.render
+		// But use basic first
+		if (window.Subtitles) {
+			if (window.subt) {
+				subList = subt.currentSub(audio.currentTime);
+				let scnt = 0;
+				let subContent = "";
+				while (scnt < subList.length) {
+					while (subList[scnt].text[0].text.search("\n") != -1) {
+						subList[scnt].text[0].text = subList[scnt].text[0].text.replace("\n", "<br/>");
+					}
+					let tempSubContent = "";
+					let tempBracketStack = 0;
+					Array.from(subList[scnt].text[0].text).forEach((e) => {
+						if (e == "{") {
+							tempBracketStack ++;
+						} else if (e == "}") {
+							tempBracketStack --;
+						} else {
+							if (tempBracketStack < 1) {
+								tempSubContent += e;
+							}
+						}
+					});
+					subContent += "<span>" + tempSubContent + "</span><br/>";
+					scnt ++;
+				}
+				gui.subtitle.innerHTML = subContent;
+				let subSize = Math.round(Math.sqrt(innerWidth * innerHeight / 1280 / 720) * 28);
+				if (subSize < 12) {
+					subSize = 12;
+				};
+				gui.subtitle.style.fontSize = subSize.toString() + "px";
+			}
+		}
+	} else {
+		gui.subtitle.innerHTML = "";
+	}
 	// Show time
 	let currentMin = Math.floor(video.currentTime / 60).toString();
 	while (currentMin.length < 2) {
@@ -251,7 +376,15 @@ function refresherThreadFunc() {
 	// Show FPS
 	fps.last = fps.curr;
 	fps.curr = new Date();
-	fps.innerHTML = (Math.round(1000 / (timeSt(fps.curr) - timeSt(fps.last)))).toString() + "FPS";
+	fps.innerHTML = (Math.round(1000 / (timeSt(fps.curr) - timeSt(fps.last)))).toString() + "($1)".replace("$1", visualizerFPS);
+	if (!(window.inactive)) {
+		fpsHistory[fpsHistoryWriterPin] = Math.round(10000 / (timeSt(fps.curr) - timeSt(fps.last)));
+		if (fpsHistoryWriterPin >= fpsHistory.length - 1) {
+			fpsHistoryWriterPin = 0;
+		} else {
+			fpsHistoryWriterPin ++;
+		}
+	};
 	let timeArr = [fps.curr.getHours().toString(), fps.curr.getMinutes().toString(), fps.curr.getSeconds().toString()];
 	for (let countA = 0; countA < timeArr.length; countA++) {
 		if (timeArr[countA].length < 2) {
@@ -528,6 +661,9 @@ document.onreadystatechange = function() {
 		mediaMode = "S";
 		// Prepare for microphone connect
 		gui.connectMic.innerHTML = lang.audioMenuStrings["connect-mic"];
+		// Prepare for framerate monitoring
+		fpsHistory = new Uint16Array(60);
+		fpsHistoryWriterPin = 0;
 		// Initialize audio environment
 		audioCxt = new AudioContext();
 		audioMedia = audioCxt.createMediaElementSource(audio);
@@ -538,18 +674,47 @@ document.onreadystatechange = function() {
 		audioMerger = audioCxt.createChannelMerger(2);
 		audioGain = audioCxt.createGain();
 		audioDC = audioCxt.createDynamicsCompressor();
+		audioMSNoiseReducer = audioCxt.createBiquadFilter();
 		audioMSGain = audioCxt.createGain();
 		audioAnlArray = ["L", "R"];
 		audioAnlArray.forEach((e, i, a) => {
 			a[i] = audioCxt.createAnalyser();
 			a[i].fftSize = 1024;
 		});
+		// Equalizer
+		audioEQArray = [0, 312, 696, 1464, 3000];
+		audioEQArray.forEach((e, i, a) => {
+			a[i] = audioCxt.createBiquadFilter();
+			if (i != 0) {
+				a[i-1].connect(a[i]);
+				if (i <= a.length - 1) {
+					a[i].type = "peaking";
+				} else {
+					a[i].type = "highshelf";
+				}
+			} else {
+				a[i].type = "lowshelf";
+				a[i].frequency.setValueAtTime(312, audioCxt.currentTime);
+			};
+		});
+		audioEQArray[1].frequency.setValueAtTime(504, audioCxt.currentTime);
+		audioEQArray[1].Q.setValueAtTime(384, audioCxt.currentTime);
+		audioEQArray[2].frequency.setValueAtTime(1080, audioCxt.currentTime);
+		audioEQArray[2].Q.setValueAtTime(768, audioCxt.currentTime);
+		audioEQArray[3].frequency.setValueAtTime(2232, audioCxt.currentTime);
+		audioEQArray[3].Q.setValueAtTime(1536, audioCxt.currentTime);
+		audioEQArray[4].frequency.setValueAtTime(3000, audioCxt.currentTime);
+		// Microphone noise reduction
+		audioMSNoiseReducer.frequency.setValueAtTime(1000, audioCxt.currentTime);
+		audioMSNoiseReducer.type = "highshelf";
+		audioMSNoiseReducer.gain.setValueAtTime(-16, audioCxt.currentTime);
 		// Connects to unprocessed audio
 		audioMedia.connect(audioDC);
-		audioDC.connect(audioGain);
+		audioDC.connect(audioEQArray[0]);
+		audioEQArray[audioEQArray.length - 1].connect(audioGain);
 		audioGain.connect(audioCxt.destination);
 		// Enables FFT and FFT-F visualizers
-		audioMedia.connect(audioAnl);
+		audioEQArray[audioEQArray.length - 1].connect(audioAnl);
 		// Enables OSC-XY
 		audioMedia.connect(audioChannels);
 		audioAnlArray.forEach((e, i) => {
@@ -574,7 +739,7 @@ document.onreadystatechange = function() {
 		visualizerMode = "empty";
 		visualizerModeList = ["empty", "osc-xy", "fft", "osc"];
 		// Data saving thread
-		dataSaverThread = setInterval(dataSaverThreadFunc, 500);
+		dataSaverThread = setInterval(dataSaverThreadFunc, 5000);
 		// Load
 		video.addEventListener("readystatechange", function() {
 			if (this.readyState == 4) {
@@ -712,7 +877,10 @@ document.onreadystatechange = function() {
 		fps.curr = new Date();
 		// Load refresher
 		refresherThread = setInterval(refresherThreadFunc, 33.3);
-		visualizerThread = setInterval(audioVisualizer, 1/60);
+		audioPanelThread = setInterval(audioPanelThreadFunc, 1000/15);
+		visualizerThread = setInterval(audioVisualizer, 1000/60);
+		visualizerShiftingThread = setInterval(visualizerShiftingFunc, 500);
+		visualizerFPS = 60;
 		// Load media
 		if (window.TabSearch) {
 			info = TabSearch(location.search);
@@ -745,14 +913,18 @@ document.onreadystatechange = function() {
 		// Smart resource
 		document.body.onblur = function() {
 			clearInterval(refresherThread);
+			clearInterval(audioPanelThread);
 			//clearInterval(visualizerThread);
 			refresherThread = setInterval(refresherThreadFunc, 1000);
+			audioPanelThread = setInterval(audioPanelThreadFunc, 1000);
 			console.log(lang.resourceSlowed);
 			window.inactive = true;
 			document.body.onfocus = function() {
 				window.inactive = false;
 				clearInterval(refresherThread);
+				clearInterval(audioPanelThread);
 				refresherThread = setInterval(refresherThreadFunc, 33.3);
+				audioPanelThread = setInterval(audioPanelThreadFunc, 1000/15);
 				console.log(lang.resourceRegained);
 			};
 			canvasAddDisconnect();
@@ -1029,7 +1201,8 @@ function loadUserMedia() {
 					video: false
 				}).then((mediaStream) => {
 					audioMS = audioCxt.createMediaStreamSource(mediaStream);
-					audioMS.connect(audioMSGain);
+					audioMS.connect(audioMSNoiseReducer);
+					audioMSNoiseReducer.connect(audioMSGain);
 					audioMSGain.connect(audioDC);
 				}).catch((errorMsg) => {
 					throw(errorMsg);
@@ -1041,7 +1214,8 @@ function loadUserMedia() {
 				video: false
 			}).then((mediaStream) => {
 				audioMS = audioCxt.createMediaStreamSource(mediaStream);
-				audioMS.connect(audioMSGain);
+				audioMS.connect(audioMSNoiseReducer);
+				audioMSNoiseReducer.connect(audioMSGain);
 				audioMSGain.connect(audioDC);
 			}).catch((errorMsg) => {
 				throw(errorMsg);
@@ -1090,6 +1264,7 @@ function loadBlobMedia(files, isFromPlaylist = false, willPlayWhenFinish = false
 				video.play();
 				audio.play();
 			};
+			window.subt = undefined;
 			if (window.jsmediatags && files[count].type.indexOf("audio") == 0) {
 				new jsmediatags.Reader(blobMedia).read({
 					onSuccess: (e) => {
@@ -1116,6 +1291,61 @@ function loadBlobMedia(files, isFromPlaylist = false, willPlayWhenFinish = false
 						document.querySelector("#playback-img").src = "img/defaultBackground.jpg";
 					}
 				});
+			};
+			if (files[count].name) {
+				let historyItem = localStorage.getItem("WEBMPF:" + CryptoJS.SHA1(files[count].name));
+				if (historyItem) {
+					historyItem = JSON.parse(historyItem);
+					if (historyItem.currentTime) {
+						video.currentTime = historyItem.currentTime;
+						audio.currentTime = historyItem.currentTime;
+					} else {
+						video.currentTime = 0;
+						audio.currentTime = 0;
+					};
+					if (historyItem.currentPlaybackRate) {
+						video.playbackRate = historyItem.currentPlaybackRate;
+						audio.playbackRate = historyItem.currentPlaybackRate;
+					} else {
+						video.playbackRate = 1;
+						audio.playbackRate = 1;
+					};
+					if (historyItem.offset) {
+						config.delay = historyItem.offset;
+					} else {
+						config.delay = 0;
+					};
+					if (historyItem.currentVolume) {
+						audioGain.gain.setValueAtTime(historyItem.currentVolume, audioCxt.currentTime);
+					} else {
+						audioGain.gain.setValueAtTime(1, audioCxt.currentTime);
+					};
+					if (historyItem.subtitle) {
+						if (historyItem.subtitleType) {
+							subt = new Subtitles(historyItem.subtitle);
+							subt.import[historyItem.subtitleType.toLowerCase()]();
+						} else {
+							subt = new Subtitles(historyItem.subtitle);
+							try {
+								subt.import.srt();
+							} catch (error) {
+								try {
+									subt.import.vtt();
+								} catch (error) {
+									try {
+										subt.import.lrc();
+									} catch (error) {
+										try {
+											subt.import.ass();
+										} catch (error) {
+											console.error(lang.corruptedHistorySubtitle);
+										};
+									};
+								};
+							};
+						};
+					};
+				};
 			};
 			analyzeAudio();
 		} else if (files[count].type == "") {
@@ -1148,6 +1378,22 @@ function loadBlobMedia(files, isFromPlaylist = false, willPlayWhenFinish = false
 						else {
 							subt = new Subtitles(this.result);
 							subt.import.ass();
+							console.log(subt);
+						}
+					};
+					fileRead.readAsText(files[count]);
+					break;
+				};
+				case "lrc": {
+					let fileRead = new FileReader();
+					fileRead.onloadend = function () {
+						if (this.error) {
+							notify.push("sound/error.aac");
+							gui.status.push(lang.subReadError);
+						}
+						else {
+							subt = new Subtitles(this.result);
+							subt.import.lrc();
 							console.log(subt);
 						}
 					};
@@ -1249,7 +1495,6 @@ function loadURLMedia(url, name = lang.defaultTitle) {
 analyzeAudio = function () {
 	if (!(window.audioConnected)) {
 		// For future sound effects
-		audioEqMatrix = [];
 		audioConnected = true;
 	}
 	visualizer = {};
@@ -1298,7 +1543,7 @@ function audioVisualizer () {
 							}
 						}
 					}
-				}
+				};
 				break;
 			};
 			case "empty": {
@@ -1329,7 +1574,17 @@ function audioVisualizer () {
 					gui.ctx.textAlign = "end";
 					gui.ctx.fillStyle = "#ff0";
 					gui.ctx.fillText(audioAnl.frequencyBinCount.toString() + "-" + frequencyWidth.toString() + "Hz", gui.canvas.width - 1, 36);
-				}
+					let thresholdDC = audioDC.threshold.value;
+					if (thresholdDC <= -30) {
+						if (thresholdDC >= -100) {
+							gui.ctx.strokeStyle = "#f00";
+							gui.ctx.beginPath();
+							gui.ctx.moveTo(0, gui.canvas.height * (-30 - thresholdDC) / 70);
+							gui.ctx.lineTo(gui.canvas.width, gui.canvas.height * (-30 - thresholdDC) / 70);
+							gui.ctx.stroke();
+						};
+					};
+				};
 				break;
 			};
 			case "fft-f": {
@@ -1358,7 +1613,17 @@ function audioVisualizer () {
 					gui.ctx.textAlign = "end";
 					gui.ctx.fillStyle = "#ff0";
 					gui.ctx.fillText("1024-" + frequencyWidth.toString() + "Hz", gui.canvas.width - 1, 36);
-				}
+					let thresholdDC = audioDC.threshold.value;
+					if (thresholdDC <= -30) {
+						if (thresholdDC >= -130) {
+							gui.ctx.strokeStyle = "#f00";
+							gui.ctx.beginPath();
+							gui.ctx.moveTo(0, gui.canvas.height * (-30 - thresholdDC) / 100);
+							gui.ctx.lineTo(gui.canvas.width, gui.canvas.height * (-30 - thresholdDC) / 100);
+							gui.ctx.stroke();
+						};
+					};
+				};
 				break;
 			};
 		}
@@ -1408,15 +1673,19 @@ if (window.navigator) {
 					"miAlbum": "专辑",
 					"miTitle": "标题",
 					"unknown": "未知",
+					"visualizerFramerateShift": "可视化效果帧率已自动调整至%i",
 					"audioMenuStrings": {
 						"audio-menu-title": "混音板",
 						"audio-menu-volume": "媒体音量：",
-						"audio-menu-mic": "麦克风音量：",
+						"audio-menu-mic": "话筒音量：",
 						"audio-menu-playback": "播放速度：",
-						"audio-menu-dyncompr": "防破音声响上限：",
-						"audio-menu-eqbass": "均衡器低频部分：",
-						"audio-menu-eqvocal": "均衡器中频部分：",
-						"audio-menu-eqtreble": "均衡器高频部分：",
+						"audio-menu-dyncompr": "抑音极限：",
+						"audio-menu-eqbass": "EQ-312：",
+						"audio-menu-eqvocal": "EQ-696：",
+						"audio-menu-eqtreble": "EQ-1464：",
+						"audio-menu-eqstart": "EQ-0：",
+						"audio-menu-eqstop": "EQ-3000：",
+						"audio-menu-convolver": "回声强度：",
 						"connect-mic": "连接麦克风"
 					}
 				}
@@ -1450,15 +1719,19 @@ if (window.navigator) {
 					"miAlbum": "專輯",
 					"miTitle": "標題",
 					"unknown": "未知",
+					"visualizerFramerateShift": "可視化效果幀率已調整至%i",
 					"audioMenuStrings": {
 						"audio-menu-title": "調音板",
 						"audio-menu-volume": "媒體音量：",
 						"audio-menu-mic": "話筒音量：",
 						"audio-menu-playback": "回放速度：",
-						"audio-menu-dyncompr": "防破音聲級上限：",
-						"audio-menu-eqbass": "均衡器低頻部分：",
-						"audio-menu-eqvocal": "均衡器中頻部分：",
-						"audio-menu-eqtreble": "均衡器高頻部分：",
+						"audio-menu-dyncompr": "抑音極限：",
+						"audio-menu-eqbass": "EQ-312：",
+						"audio-menu-eqvocal": "EQ-696：",
+						"audio-menu-eqtreble": "EQ-1464：",
+						"audio-menu-eqstart": "EQ-0：",
+						"audio-menu-eqstop": "EQ-3000：",
+						"audio-menu-convolver": "回響強度：",
 						"connect-mic": "連接話筒"
 					}
 				};
@@ -1490,15 +1763,19 @@ if (window.navigator) {
 					"miAlbum": "Album",
 					"miTitle": "title",
 					"unknown": "Unknown",
+					"visualizerFramerateShift": "Framerate of the visualizer automatically changed to %i",
 					"audioMenuStrings": {
 						"audio-menu-title": "Audio Mixing Panel",
-						"audio-menu-volume": "Media Volume：",
-						"audio-menu-mic": "Mic Volume：",
-						"audio-menu-playback": "Playback Rate：",
-						"audio-menu-dyncompr": "Compressor：",
-						"audio-menu-eqbass": "EQ Bass：",
-						"audio-menu-eqvocal": "EQ Vocal：",
-						"audio-menu-eqtreble": "EQ Treble：",
+						"audio-menu-volume": "Media Vol：",
+						"audio-menu-mic": "Mic Vol：",
+						"audio-menu-playback": "Speed：",
+						"audio-menu-dyncompr": "Muffler：",
+						"audio-menu-eqbass": "EQ-312：",
+						"audio-menu-eqvocal": "EQ-696：",
+						"audio-menu-eqtreble": "EQ-1464：",
+						"audio-menu-eqstart": "EQ-0：",
+						"audio-menu-eqstop": "EQ-3000：",
+						"audio-menu-convolver": "Spacing：",
 						"connect-mic": "Connect Mic"
 					}
 				}
