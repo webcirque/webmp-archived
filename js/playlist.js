@@ -13,7 +13,7 @@ if (window.navigator) {
 						loop: "循环"
 					},
 					switchMediaRequired: "已收到切换媒体请求。",
-					switchMediaMode: "使用$1$2模式切换媒体。"
+					switchMediaMode: "使用$1$2模式切换媒体。",
 				};
 				break;
 			};
@@ -48,6 +48,17 @@ if (window.navigator) {
 		}
 	}
 }
+
+// Apply global debug message template
+msgTp = {
+	// Success messages
+	"TEMP_FILE_SYSTEM_READY": "Temporary file system on worker is ready.",
+	// Info messages
+	"ADD_MEDIA_OPERATION_STARTED": "Add media operation started.",
+	// Fail messages
+	"TEMP_FILE_SYSTEM_FAILED_TO_LOAD": "Temporary file system failed to load: %s",
+	"FILE_WRITE_ERROR_ALREADY_HAD_DATA": "Provided file path already had data inside. Delete it or cancel operation."
+};
 
 // Apply message receiver
 addEventListener("message", (ev) => {
@@ -89,6 +100,36 @@ addEventListener("message", (ev) => {
 	};
 });
 
+// Operation Tracking System implemented
+function OTS(workerURL = null) {
+	if (workerURL.constructor == String) {
+		this.worker = new Worker(workerURL);
+	} else {
+		throw(new Error("Empty worker URL."));
+	};
+	this.operations = [];
+	this.pushJob = function (identifier = new Date().toJSON()) {
+		let job = new OTSJob(identifier);
+		this.operations.push(job);
+		return job;
+	};
+	this.getJobByIdentifier = function () {};
+	this.changeJobStatusByIndex = function () {};
+};
+function OTSJob(identifier = new Date().toJSON()) {
+	this.WORKING = 0;
+	this.FINISH_INFO = 1;
+	this.FINISH_FAIL = 2;
+	this.FINISH_DONE = 3;
+	this.identifier = identifier;
+	this.onworking = null;
+	this.onended = null;
+	this.onsuccess = null;
+	this.onfail = null;
+	this.index = -1;
+	this.status = this.WORKING;
+};
+
 // Initialize
 document.addEventListener("readystatechange", function () {
 	if (this.readyState.toLowerCase() == "interactive") {
@@ -100,6 +141,37 @@ document.addEventListener("readystatechange", function () {
 		mode.current = localStorage.getItem("WEBMPS:playlistMode");
 		if (mode.current == "null" || mode.current == null) {
 			mode.current = "order";
+		};
+		ots = new OTS("js/playlistWorker.js");
+		// Try to use Web Worker to process playlist data
+		ots.worker.onmessage = (e) => {
+			// Message delivery
+			switch (e.data.type) {
+				case "notification/success": {
+					let workerMsg = msgTp[e.data.message];
+					if (!(workerMsg)) {
+						workerMsg = e.data.message;
+					};
+					console.log(workerMsg);
+					break;
+				};
+				case "notification/info": {
+					let workerMsg = msgTp[e.data.message];
+					if (!(workerMsg)) {
+						workerMsg = e.data.message;
+					};
+					console.warn(workerMsg);
+					break;
+				}
+				case "notification/fail": {
+					let workerMsg = msgTp[e.data.message];
+					if (!(workerMsg)) {
+						workerMsg = e.data.message;
+					};
+					console.error(workerMsg, e.data.error || "No further information provided.");
+					break;
+				};
+			};
 		};
 	};
 });

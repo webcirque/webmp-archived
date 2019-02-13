@@ -93,7 +93,6 @@ document.onreadystatechange = function () {
 			settingSwitchTo = function (t) {
 				for (let settingTabName in settingTabs) {
 					if (t != settingTabName) {
-						console.info(settingTabs[settingTabName]);
 						settingTabs[settingTabName].style.display = "none";
 					} else {
 						settingTabs[t].style.display = "";

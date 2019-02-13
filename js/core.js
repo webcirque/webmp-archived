@@ -344,7 +344,7 @@ function refresherThreadFunc() {
 					scnt ++;
 				}
 				gui.subtitle.innerHTML = subContent;
-				let subSize = Math.round(Math.sqrt(innerWidth * innerHeight / 1280 / 720) * 28);
+				let subSize = Math.round(Math.sqrt(innerWidth * innerHeight / 1280 / 720) * 36);
 				if (subSize < 12) {
 					subSize = 12;
 				};
@@ -1232,113 +1232,145 @@ function loadBlobMedia(files, isFromPlaylist = false, willPlayWhenFinish = false
 	while (count <files.length) {
 		console.info(files[count]);
 		if (files[count].type.indexOf("video") == 0 || files[count].type.indexOf("audio") == 0) {
-			if (window.blobURL) {
-				// Clear previous blob
-				URL.revokeObjectURL(blobURL);
-				window.blobURL = undefined;
-			} else if (audio.srcObject || video.srcObject) {
-				video.srcObject = null;
-				audio.srcObject = null;
-			}
-			blobMedia = files[count];
-			if (files[count].type.indexOf("video") == 0) {
-				gui.ctx.clearRect(0, 0, gui.canvas.width, gui.canvas.height);
-				document.querySelector("#media-info img").src = false;
-				document.querySelector("#playback-img").src = false;
-			}
-			if (isFromPlaylist == false && files[count].type.indexOf("audio") == 0) {
-				window.parent.postMessage({
-					"type": "forward:playlist",
-					"data": {
-						"specify": "addBlobMedia",
-						"data": blobMedia
+			let fileNameArr = files[count].name.split(".");
+			let fileName = "";
+			let mediaNameArr = undefined;
+			let mediaName = "";
+			fileNameArr.forEach((e, i, a) => {
+				if (i < a.length - 1) {
+					if (i != 0) {
+						fileName += ".";
 					}
-				}, "*");
+					fileName += e;
+				}
+			})
+			if (window.blobMedia) {
+				if (blobMedia.name) {
+					mediaNameArr = blobMedia.name.split(".");
+					mediaNameArr.forEach((e, i, a) => {
+						if (i < a.length - 1) {
+							if (i != 0) {
+								mediaName += ".";
+							}
+							mediaName += e;
+						}
+					});
+				}
 			};
-			blobURL = URL.createObjectURL(blobMedia);
-			vcs = [blobMedia.name];
-			video.src = blobURL;
-			audio.src = blobURL;
-			mediaInfo = undefined;
-			if (willPlayWhenFinish) {
-				video.play();
-				audio.play();
-			};
-			window.subt = undefined;
-			if (window.jsmediatags && files[count].type.indexOf("audio") == 0) {
-				new jsmediatags.Reader(blobMedia).read({
-					onSuccess: (e) => {
-						mediaInfo = e;
-						mediaPicture = undefined;
-						if (e.tags.picture) {
-							mediaPicture = "";
-							e.tags.picture.data.forEach((f) => {
-								mediaPicture += String.fromCharCode(f);
-							});
-							mediaPicture = "data:" + e.tags.picture.format + ";base64," + btoa(mediaPicture);
-							document.querySelector("#media-info img").src = mediaPicture;
-							document.querySelector("#playback-img").src = mediaPicture;
-						} else {
+			if ((mediaName != fileName) || (mediaName == fileName && files[count].type.indexOf("video") == 0)) {
+				if (window.blobURL) {
+					// Clear previous blob
+					URL.revokeObjectURL(blobURL);
+					window.blobURL = undefined;
+				} else if (audio.srcObject || video.srcObject) {
+					video.srcObject = null;
+					audio.srcObject = null;
+				};
+				if (window.blobAudioTrackURL) {
+					URL.revokeObjectURL(blobAudioTrackURL);
+					window.blobAudioTrackURL = undefined;
+				};
+				blobMedia = files[count];
+				if (files[count].type.indexOf("video") == 0) {
+					gui.ctx.clearRect(0, 0, gui.canvas.width, gui.canvas.height);
+					document.querySelector("#media-info img").src = false;
+					document.querySelector("#playback-img").src = false;
+				}
+				if (isFromPlaylist == false && files[count].type.indexOf("audio") == 0) {
+					window.parent.postMessage({
+						"type": "forward:playlist",
+						"data": {
+							"specify": "addBlobMedia",
+							"data": blobMedia
+						}
+					}, "*");
+				};
+				blobURL = URL.createObjectURL(blobMedia);
+				vcs = [blobMedia.name];
+				video.src = blobURL;
+				audio.src = blobURL;
+				mediaInfo = undefined;
+				if (willPlayWhenFinish) {
+					video.play();
+					audio.play();
+				};
+				window.subt = undefined;
+				if (window.jsmediatags && files[count].type.indexOf("audio") == 0) {
+					new jsmediatags.Reader(blobMedia).read({
+						onSuccess: (e) => {
+							mediaInfo = e;
+							mediaPicture = undefined;
+							if (e.tags.picture) {
+								mediaPicture = "";
+								e.tags.picture.data.forEach((f) => {
+									mediaPicture += String.fromCharCode(f);
+								});
+								mediaPicture = "data:" + e.tags.picture.format + ";base64," + btoa(mediaPicture);
+								document.querySelector("#media-info img").src = mediaPicture;
+								document.querySelector("#playback-img").src = mediaPicture;
+							} else {
+								document.querySelector("#media-info img").src = "img/defaultIcon.png";
+								document.querySelector("#playback-img").src = "img/defaultBackground.jpg";
+							}
+							console.log(e);
+						},
+						onError: (e) => {
+							mediaInfo = undefined;
+							console.error(e.stack);
 							document.querySelector("#media-info img").src = "img/defaultIcon.png";
 							document.querySelector("#playback-img").src = "img/defaultBackground.jpg";
 						}
-						console.log(e);
-					},
-					onError: (e) => {
-						mediaInfo = undefined;
-						console.error(e.stack);
-						document.querySelector("#media-info img").src = "img/defaultIcon.png";
-						document.querySelector("#playback-img").src = "img/defaultBackground.jpg";
-					}
-				});
-			};
-			if (files[count].name) {
-				let historyItem = localStorage.getItem("WEBMPF:" + CryptoJS.SHA1(files[count].name));
-				if (historyItem) {
-					historyItem = JSON.parse(historyItem);
-					if (historyItem.currentTime) {
-						video.currentTime = historyItem.currentTime;
-						audio.currentTime = historyItem.currentTime;
-					} else {
-						video.currentTime = 0;
-						audio.currentTime = 0;
-					};
-					if (historyItem.currentPlaybackRate) {
-						video.playbackRate = historyItem.currentPlaybackRate;
-						audio.playbackRate = historyItem.currentPlaybackRate;
-					} else {
-						video.playbackRate = 1;
-						audio.playbackRate = 1;
-					};
-					if (historyItem.offset) {
-						config.delay = historyItem.offset;
-					} else {
-						config.delay = 0;
-					};
-					if (historyItem.currentVolume) {
-						audioGain.gain.setValueAtTime(historyItem.currentVolume, audioCxt.currentTime);
-					} else {
-						audioGain.gain.setValueAtTime(1, audioCxt.currentTime);
-					};
-					if (historyItem.subtitle) {
-						if (historyItem.subtitleType) {
-							subt = new Subtitles(historyItem.subtitle);
-							subt.import[historyItem.subtitleType.toLowerCase()]();
+					});
+				};
+				if (files[count].name) {
+					let historyItem = localStorage.getItem("WEBMPF:" + CryptoJS.SHA1(files[count].name));
+					if (historyItem) {
+						historyItem = JSON.parse(historyItem);
+						if (historyItem.currentTime) {
+							if (historyItem.mediaInfo) {
+								if (historyItem < historyItem.mediaInfo.mediaDuration - 10 && historyItem < historyItem.mediaInfo.mediaDuration * 0.95) {
+									audio.currentTime = historyItem.currentTime;
+									video.currentTime = historyItem.currentTime;
+								}
+							}
+						};
+						if (historyItem.currentPlaybackRate) {
+							video.playbackRate = historyItem.currentPlaybackRate;
+							audio.playbackRate = historyItem.currentPlaybackRate;
 						} else {
-							subt = new Subtitles(historyItem.subtitle);
-							try {
-								subt.import.srt();
-							} catch (error) {
+							video.playbackRate = 1;
+							audio.playbackRate = 1;
+						};
+						if (historyItem.offset) {
+							config.delay = historyItem.offset;
+						} else {
+							config.delay = 0;
+						};
+						if (historyItem.currentVolume) {
+							if (historyItem.currentVolume > 1) {
+								audioGain.gain.setValueAtTime(historyItem.currentVolume, audioCxt.currentTime);
+							};
+						};
+						if (historyItem.subtitle) {
+							if (historyItem.subtitleType) {
+								subt = new Subtitles(historyItem.subtitle);
+								subt.import[historyItem.subtitleType.toLowerCase()]();
+							} else {
+								subt = new Subtitles(historyItem.subtitle);
 								try {
-									subt.import.vtt();
+									subt.import.srt();
 								} catch (error) {
 									try {
-										subt.import.lrc();
+										subt.import.vtt();
 									} catch (error) {
 										try {
-											subt.import.ass();
+											subt.import.lrc();
 										} catch (error) {
-											console.error(lang.corruptedHistorySubtitle);
+											try {
+												subt.import.ass();
+											} catch (error) {
+												console.error(lang.corruptedHistorySubtitle);
+											};
 										};
 									};
 								};
@@ -1346,8 +1378,16 @@ function loadBlobMedia(files, isFromPlaylist = false, willPlayWhenFinish = false
 						};
 					};
 				};
+				analyzeAudio();
+			} else {
+				if (video.src != audio.src) {
+					if (window.blobAudioTrackURL) {
+						URL.revokeObjectURL(blobAudioTrackURL);
+					};
+				};
+				blobAudioTrackURL = URL.createObjectURL(files[count]);
+				audio.src = blobAudioTrackURL;
 			};
-			analyzeAudio();
 		} else if (files[count].type == "") {
 			let fileName = files[count].name;
 			switch (fileName.split(".")[fileName.split(".").length - 1].toLowerCase()) {

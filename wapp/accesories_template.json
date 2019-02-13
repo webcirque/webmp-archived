@@ -1,0 +1,38 @@
+{
+	"name": "Accesories for Webcirque Media Player",
+	"short_name": "WebMP Tools",
+	"background_color": "#000",
+	"description": "WebMP doesn't only have a player included!",
+	"display": "standalone",
+	"icons": [
+		{
+			"type": "image/png",
+			"src": "../img/icon32.png",
+			"sizes": "32x32"
+		},
+		{
+			"type": "image/png",
+			"src": "../img/icon64.png",
+			"sizes": "64x64"
+		},
+		{
+			"type": "image/png",
+			"src": "../img/icon128.png",
+			"sizes": "128x128"
+		},
+		{
+			"type": "image/png",
+			"src": "../img/icon256.png",
+			"sizes": "256x256"
+		},
+		{
+			"type": "image/png",
+			"src": "../img/icon512.png",
+			"sizes": "512x512"
+		}
+	],
+	"lang": "en_US",
+	"scope": "../tools/",
+	"start_url": "../tools/index.htm",
+	"theme_color": "#111"
+}
