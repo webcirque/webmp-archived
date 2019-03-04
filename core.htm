@@ -10,127 +10,31 @@
 	<script src="libs/crypto.js"></script>
 	<script src="libs/sha1.js"></script>
 	<script src="libs/base64.min.js"></script>
-	<script src="libs/enc-base64.js"></script>
-	<script src="libs/enc-utf8.js"></script>
-	<script src="libs/enc-utf16.js"></script>
 	<script src="libs/jsmediatags.min.js"></script>
 	<script src="js/core.js"></script>
 	<title>WebMP DR28</title>
 </head>
 <body>
-	<div abs="	  " class="background video-container" id="vid-win">
-		<img id="playback-img"></img>
-		<canvas id="audio-visualizer"></canvas>
-		<div id="media-info">
-			<img></img>
-			<table cellspacing="0">
-				<tr id="media-info-artist">
-					<td>Artist</td>
-					<td></td>
-				</tr>
-				<tr id="media-info-album">
-					<td>Album</td>
-					<td></td>
-				</tr>
-				<tr id="media-info-title">
-					<td>Title</td>
-					<td></td>
-				</tr>
-			</table>
+	<div class="video-container">
+		<canvas id="c-visualizer"></canvas>
+		<div id="idct-meta">
+			<img src="img/placeholder.png"/>
+			<table></table>
 		</div>
-		<video></video>
-		<audio>
-		</audio>
-		<audio id="notify">
-		</audio>
-		<div id="vid-mask">
-			<div id="subtitle">
-			</div>
-			<div id="play-if-ok">
-				<img src="img/play.png"/>
-			</div>
-			<div id="loading-anime"></div>
-		</div>
-		<div id="topbar">
-			<div id="FPS" style="left:2px;font-size:16px;line-height:22px;">
-				32FPS
-			</div>
-			<div id="title" style="left:50%;transform:translate(-50%,0);font-size:16px;line-height:22px;">
-				test.mp4
-			</div>
-			<div id="battery">
-			</div>
-			<div id="time">
-				00:00:00
-			</div>
-		</div>
-		<div id="bottom">
-			<div abs="" class="plainbtn" id="playbtn" style="display: none;">
-				<img src="img/play.png"/>
-			</div>
-			<div abs="" class="plainbtn" id="pausebtn" style="display: none;">
-				<img src="img/pause.png"/>
-			</div>
-			<div id="status">
-			</div>
-			<div id="time-now">
-				00:00
-			</div>
-			<div id="time-all">
-				00:00
-			</div>
-			<div id="time-bar">
-				<div id="time-played">
-				</div>
-			</div>
-			<div>
-				<img id="volume" src="img/muted.png" style="width: 24px; height: 24px; left: 66px; top: 20px; filter: invert(100%);"/>
-				<div id="volumeshow" onmousedown="shift = 0;" style="left: 92px; top: 22px;">
-				</div>
-				<div id="volumeback">
-					<div id="volumebar">
-					</div>
-				</div>
-			</div>
-			<div>
-				<img src="img/playbackSpeed.png" style="width: 24px; height: 24px; left: 144px; top: 20px; filter: invert(100%);"/>
-				<div id="speed" style="left: 170px; top: 22px;">
-					x1.0
-				</div>
-			</div>
-			<div>
-				<img src="img/dynamicCompressor.png" style="width: 24px; height: 24px; left: 270px; top: 20px; filter: invert(100%);"/>
-				<div id="dcshow" style="left: 296px; top: 22px;">
-					-24dB
-				</div>
-			</div>
-			<div id="sub">
-				OPEN
-			</div>
-		</div>
-		<input id="subfbtn" type="file"/>
+		<video id="wmp-video"></video>
+		<audio id="wmp-audio"></audio>
+		<audio id="wmp-fallback"></audio>
+		<canvas id="subtitles"></canvas>
 	</div>
-	<div id="audio-menu">
-		<img class="close-button" src="img/close.png" style="position: absolute; top: 8px; right: 8px;" />
-		<p class="audio-menu-title" id="audio-menu-title" style="font-size:20px; margin: 0; height: 28px; line-height: 28px; background: #000;">lang.audioMixingMenu</p>
-		<p class="audio-menu-tile" id="audio-menu-volume">lang.mediaVolume</p>
-		<p class="audio-menu-tile" id="audio-menu-mic">lang.micVolume</p>
-		<p class="audio-menu-tile" id="audio-menu-playback">lang.speed</p>
-		<p class="audio-menu-tile" id="audio-menu-dyncompr">lang.dynamicCompressThreshold</p>
-		<p class="audio-menu-tile" id="audio-menu-eqstart">lang.equalizerStart</p>
-		<p class="audio-menu-tile" id="audio-menu-eqbass">lang.equalizerLowFreq</p>
-		<p class="audio-menu-tile" id="audio-menu-eqvocal">lang.equalizerMediumFreq</p>
-		<p class="audio-menu-tile" id="audio-menu-eqtreble">lang.equalizerHighFreq</p>
-		<p class="audio-menu-tile" id="audio-menu-eqstop">lang.equalizerStop</p>
-		<div id="connect-mic">lang.connectMicrophone</div>
-		<input id="audio-menu-public" type="range" min="0" max="1" step="0.001" value="0"></input>
+	<div class="topbar">
+		<div id="filename">$Filename</div>
 	</div>
-	<div id="volumepanel" style="display:none;">
-		<div id="volume-btn-minus" style="font-size: 54px;">
-			-
-		</div>
-		<div id="volume-btn-plus" style="font-size: 54px;">
-			+
-		</div>
+	<div class="controls">
+		<input type="range" id="btn-progress" step="0.0002" max="1" min="0" value="0"/>
+		<div id="btn-play"><img src="img/placeholder.png"/></div>
+		<div class="btnset-left"></div>
+		<div class="btnset-right"></div>
+		<div class="idct-left"></div>
+		<div class="idct-right"></div>
 	</div>
 </body>

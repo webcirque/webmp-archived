@@ -11,4 +11,4 @@ Can run on Windows XP/Vista/7/8/8.1/10, Android 6.0+, Ubuntu 16+ and other OS. C
 
 PS: _Firefox does not support some features._
 
-Project page at [Project Webcirque Website](https://www.pwcq.ml/projects/webmp). Please read full description there.
+Project page at [Project Webcirque Website](https://www.pwcq.ml/project/webmp). Please read full description there.
