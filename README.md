@@ -13,11 +13,23 @@ PS: _Firefox does not support some features._
 
 Project page at [Project Webcirque Website](https://www.pwcq.ml/projects/webmp). Please read full description there.
 
-# Note
+# A letter to stargazers and users of this subproject
 Dear readers,
 
 I'm sorry to tell you that the development of WebMP is halted because of following reasons.
 
 First, a vital examination is approaching, and I have to prepare for it.
 
-Second, my mother forbids me from going to the radio station, so currently I have no private access to any public desktop computers.
+Second, my mother forbids me from going to the radio station, so currently I have no private access to any public desktop computers.、
+
+Development of this subproject is likely to be resumed during minor and major holidays exclude weekends.
+
+I will upload assets of **WebMP 1.0 alpha 2** for public convenience some time.
+
+I surely feel pityful, but, I **promise**, and I **declare**, **DEVELOPMENT NEVER STOPS**!!!
+
+Sincerely,
+
+SkyFuInMC of WebMP subproject
+
+10:27 PM (+08) April 2nd, 2019
