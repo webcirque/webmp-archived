@@ -12,3 +12,12 @@ Can run on Windows XP/Vista/7/8/8.1/10, Android 6.0+, Ubuntu 16+ and other OS. C
 PS: _Firefox does not support some features._
 
 Project page at [Project Webcirque Website](https://www.pwcq.ml/projects/webmp). Please read full description there.
+
+# Note
+Dear readers,
+
+I'm sorry to tell you that the development of WebMP is halted because of following reasons.
+
+First, a vital examination is approaching, and I have to prepare for it.
+
+Second, my mother forbids me from going to the radio station, so currently I have no private access to any public desktop computers.
