@@ -1,17 +1,17 @@
 @font-face {
-	font-family: MicrosoftYahei;
+	font-family: MicrosoftYaheiWeb;
 	src: url('font/MicrosoftYahei_r.ttf');
 	font-weight: normal;
 	font-style: normal;
 }
 @font-face {
-	font-family: Verdana;
+	font-family: VerdanaWeb;
 	src: url('font/Verdana_r.ttf');
 	font-weight: normal;
 	font-style: normal;
 }
 @font-face {
-	font-family: ProductSans;
+	font-family: ProductSansWeb;
 	src: url('font/ProductSans_r.ttf');
 	font-weight: normal;
 	font-style: normal;

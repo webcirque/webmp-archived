@@ -1,0 +1,18 @@
+body.theme-classic img[class^=img-],
+body.theme-black img[class^=img-],
+body.theme-greend img[class^=img-],
+body.theme-blued img[class^=img-] {
+	filter: invert(100%);
+}
+body.theme-greenb img[class^=img-] {
+	filter: hue-rotate(-120deg) brightness(160%);
+}
+body.theme-blueb img[class^=img-] {
+	filter: hue-rotate(-10deg) saturate(200%);
+}
+body.theme-greenb * {
+	color: rgb(41, 211, 1);
+}
+body.theme-blueb * {
+	color: #3367d6;
+}

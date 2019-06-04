@@ -1,0 +1,89 @@
+div {
+	cursor: default;
+}
+h3, p {
+	margin: 2px;
+}
+body {
+	background: #000;
+}
+form, fieldset {
+	border: none;
+	outline: none;
+}
+input[type=radio] {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	border: 2px #fff solid;
+	background: transparent;
+	width: 14px;
+	height: 14px;
+	border-radius: 8px;
+}
+input[type=radio]:checked {
+	background: rgba(255, 255, 255, 0.7);
+}
+label {
+	width: 100%;
+}
+label:hover {
+	background: rgba(255, 255, 255, 0.2);
+}
+
+.tab {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 80%;
+	height: 80%;
+	background: #000;
+	color: rgba(255, 255, 255, 0.9);
+	display: none;
+}
+.tab>h3 {
+	font-size: 28px;
+	border-bottom: 1px solid #aaa;
+}
+#tab-finalize {
+	cursor: progress;
+}
+
+.universal-button, .universal-button-disabled {
+	position: absolute;
+	border: 0 solid #000;
+	border-radius: 4px;
+	padding: 6px 10px;
+	color: #fff;
+	bottom: 96px;
+	cursor: pointer;
+	filter: opacity(100%) saturation(100%);
+	transition: filter 0.3s;
+	font-size: 18px;
+}
+.universal-button-disabled {
+	filter: opacity(40%) saturate(20%);
+	transition: filter 0.3s;
+}
+#btn-prev {
+	left: 96px;
+	background: #555;
+}
+#btn-next {
+	right: 96px;
+	background: rgba(0, 159, 255, 0.6);
+	transition: background 0.3s;
+}
+#btn-next:hover {
+	background: rgba(0, 159, 255, 1);
+}
+
+div.progress {
+	width: 100%;
+	height: 22px;
+	border: 1px solid #fff;
+}
+div.progress-inner {
+	height: 100%;
+	background: rgba(255, 255, 0, 0.6);
+}

@@ -1,3 +1,189 @@
 div {
-	color: #fff;
+	position: absolute;
+	cursor: default;
+	font-size: 16px !important;
+}
+body {
+	font-size: 16px !important;
+	font-family: "Verdana", VerdanaWeb, "Microsoft Yahei", "Microsoft Yahei UI", MicrosoftYaheiWeb
+}
+
+/* Maximum video size */
+div.video-container,
+video {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+}
+
+/* Light theme and dark theme */
+body.theme-classic, body.theme-black, body.theme-greend, body.theme-blued {
+	 color: #fff;
+	 background: #000;
+}
+body.theme-classic .topbar,
+body.theme-black .topbar,
+body.theme-greend .topbar,
+body.theme-blued .topbar,
+body.theme-classic .controls,
+body.theme-black .controls,
+body.theme-greend .controls,
+body.theme-blued .controls {
+	background-color: rgba(0, 0, 0, 0.6);
+	box-shadow: 0 0 4px 0px rgba(0, 0 ,0 ,0.5);
+}
+body.theme-greenb .controls,
+body.theme-blueb .controls,
+body.theme-white .controls {
+	background-color: rgba(255, 255, 255, 0.2);
+	box-shadow: 0 0 4px 0px rgba(0, 0 ,0 ,0.5);
+}
+body.theme-classic #btn-progress,
+body.theme-black #btn-progress,
+body.theme-greend #btn-progress,
+body.theme-blued #btn-progress {
+	 background: rgba(255, 255, 255, 0.36);
+}
+body.theme-white #btn-progress,
+body.theme-greenb #btn-progress,
+body.theme-blueb #btn-progress {
+	 background: rgba(0, 0, 0, 0.36);
+}
+body.theme-classic #btn-progress::-webkit-slider-thumb, 
+body.theme-black #btn-progress::-webkit-slider-thumb, 
+body.theme-greend #btn-progress::-webkit-slider-thumb, 
+body.theme-blued #btn-progress::-webkit-slider-thumb {
+	 background: rgba(255, 255, 255, 1);
+}
+body.theme-white #btn-progress::-webkit-slider-thumb {
+	 background: rgba(0, 0, 0, 1);
+}
+body.theme-greenb #btn-progress::-webkit-slider-thumb {
+	 background: rgba(41, 211, 1, 1);
+}
+body.theme-blueb #btn-progress::-webkit-slider-thumb {
+	background: rgba(51, 103, 214, 1);
+}
+body.theme-classic #btn-progress::-moz-slider-thumb, 
+body.theme-black #btn-progress::-moz-slider-thumb, 
+body.theme-greend #btn-progress::-moz-slider-thumb, 
+body.theme-blued #btn-progress::-moz-slider-thumb {
+	 background: rgba(255, 255, 255, 1);
+}
+body.theme-greenb #btn-progress::-moz-slider-thumb {
+	 background: rgba(0, 255, 0, 1);
+}
+body.theme-blueb #btn-progress::-webkit-slider-thumb {
+	background: rgba(0, 196, 219, 1);
+}
+
+.idct-left {
+	left: 4px;
+	bottom: 0;
+}
+.idct-right {
+	right: 4px;
+	bottom: 0;
+	text-align: right;
+}
+.idct-right div, .idct-left div {
+	display: inline-block;
+	position: initial;
+}
+.idct-yes {
+	color: #0e0;
+}
+.idct-no {
+	color: #e00;
+}
+
+.controls {
+	left: 0;
+	width: 100%;
+	bottom: 0;
+	height: 72px;
+	opacity: 0.7;
+}
+.controls * {
+	outline: none;
+}
+.controls canvas#buffer-progress {
+	position: absolute;
+	top: 3px;
+	left: 4px;
+	height: 16px;
+}
+.controls input {
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	height: 4px;
+	position: absolute;
+	width: 90%;
+	top: 6px;
+	left: 2px;
+}
+.controls input::-webkit-slider-thumb {
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	width: 15px;
+	height: 15px;
+	border: 0 solid #000;
+	border-radius: 50%;
+	box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.4);
+}
+.controls input::-moz-slider-thumb {
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	width: 15px;
+	height: 15px;
+	border: 0 solid #000;
+	border-radius: 50%;
+	box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.4);
+}
+.controls #btn-play {
+	left: 50%;
+	bottom: 2px;
+	transform: translate(-50%, 0);
+}
+.controls img.img-play, .controls img.img-pause {
+	width: 48px;
+	height: 48px;
+}
+.controls img.img-pause {
+	display: none;
+}
+.controls div[class^=btnset-] img {
+	width: 24px;
+	height: 24px;
+}
+.controls div[class^=btnset-] * {
+	position: initial;
+	display: inline-block;
+}
+.controls .btnset-left {
+	right: 50%;
+	bottom: 0;
+	margin-right: 26px;
+	text-align: right;
+}
+.controls .btnset-right {
+	left: 50%;
+	bottom: 0;
+	margin-left: 26px;
+}
+
+#lyrics-board {
+	-webkit-mask-image: linear-gradient(to bottom,rgba(255,255,255,0) 0,rgba(255,255,255,.6) 15%,rgba(255,255,255,1) 25%,rgba(255,255,255,1) 75%,rgba(255,255,255,.6) 85%,rgba(255,255,255,0) 100%);
+	overflow: hidden;
+	transform: translateY(0px);
+	text-align: center;
+}
+
+* {
+	outline: none;
 }

@@ -1,0 +1,67 @@
+body {
+	color: #fff;
+	overflow: hidden;
+	font-size: 14px;
+	font-family: "Verdana", VerdanaWeb, "Microsoft Yahei", "Microsoft Yahei UI", MicrosoftYaheiWeb;
+}
+div {
+	cursor: default;
+}
+#menu, #tabs, #operation {
+	position: fixed;
+}
+#menu {
+	width: 200px;
+	height: 100%;
+	top: 0;
+	left: 0;
+	transition: left 0.5s;
+}
+#tabs {
+	width: 100%;
+	height: 100%;
+	top: 0;
+	right: 0;
+}
+#operation {
+	right: 0;
+	bottom: 0px;
+	width: 100%;
+	height: 56px;
+	transition: bottom 0.5s;
+}
+.operation-collapsed {
+	bottom: -56px !important;
+	transition: bottom 0.5s;
+}
+
+@media (max-width: 480px) , (orientation: portrait) {
+	#menu {
+		width: 100%;
+		left: 0;
+		transition: left 0.5s;
+	}
+	.menu-collapsed {
+		width: 100%;
+		left: -100% !important;
+		transition: left 0.5s;
+	}
+	#operation {
+		height: 240px;
+	}
+	.operation-collapsed {
+		bottom: -240px !important;
+	}
+}
+
+#menu ul {
+	margin: 0;
+	list-style: none;
+	padding-inline-start: 8px;
+	cursor: default;
+}
+
+/* debug usage
+* {
+	background: rgba(255, 255, 255, 0.1);
+} */
