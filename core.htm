@@ -4,21 +4,25 @@
 	<meta content="true" name="HandheldFriendly"/>
 	<meta content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" name="viewport"/>
 	<link href="css/core.css" rel="stylesheet"/>
+	<link href="css/font.css" rel="stylesheet"/>
+	<link href="css/icon_themes.css" rel="stylesheet"/>
 	<link href="img/icon.png" rel="shortcut icon"/>
+	<script src="js/icon_themes.js"></script>
 	<script src="libs/elsl.pre1.js"> </script>
 	<script src="libs/elsl.media.subtitles.js"></script>
-	<script src="libs/crypto.js"></script>
-	<script src="libs/sha1.js"></script>
-	<script src="libs/base64.min.js"></script>
+	<script src="libs/cryptojs/crypto.js"></script>
+	<script src="libs/cryptojs/sha1.js"></script>
 	<script src="libs/jsmediatags.min.js"></script>
 	<script src="js/core.js"></script>
-	<title>WebMP DR28</title>
+	<script src="js/i18n.js"></script>
+	<script src="libs/bilibili/flv.min.js"></script>
+	<title>WebMP 1.0.0</title>
 </head>
-<body>
-	<div class="video-container">
+<body class="theme-classic">
+	<div class="video-container" tabindex="-1" autofocus>
 		<canvas id="c-visualizer"></canvas>
-		<div id="idct-meta">
-			<img src="img/placeholder.png"/>
+		<div id="wae-meta">
+			<img class="img-album"/>
 			<table></table>
 		</div>
 		<video id="wmp-video"></video>
@@ -26,15 +30,32 @@
 		<audio id="wmp-fallback"></audio>
 		<canvas id="subtitles"></canvas>
 	</div>
-	<div class="topbar">
-		<div id="filename">$Filename</div>
-	</div>
 	<div class="controls">
+		<canvas id="buffer-progress" height="16"></canvas>
 		<input type="range" id="btn-progress" step="0.0002" max="1" min="0" value="0"/>
-		<div id="btn-play"><img src="img/placeholder.png"/></div>
-		<div class="btnset-left"></div>
-		<div class="btnset-right"></div>
-		<div class="idct-left"></div>
-		<div class="idct-right"></div>
+		<div id="btn-play"><img class="img-play" src="img/plain-pure/play.svg"/><img class="img-pause" src="img/plain-pure/pause.svg"/></div>
+		<div class="btnset-left">
+			<div id="btn-fsc"><img class="img-fsc" src="img/plain-pure/fullscreen.svg"/></div>
+			<div id="btn-repeat"><img class="img-repeat" src="img/plain-pure/repeat.svg"/></div><br/>
+			<div id="btn-list"><img class="img-list" src="img/plain-pure/playlist.svg"/></div>
+			<div id="btn-prev"><img class="img-prev" src="img/plain-pure/prev.svg"/></div>
+		</div>
+		<div class="btnset-right">
+			<div id="btn-vol"><img class="img-vol-hi" src="img/plain-pure/volumeHigh.svg"/></div>
+			<div id="btn-cc"><img class="img-cc" src="img/plain-pure/subtitles.svg"/></div><br/>
+			<div id="btn-next"><img class="img-next" src="img/plain-pure/next.svg"/></div>
+			<div id="btn-open"><img class="img-open" src="img/plain-pure/open.svg"/></div>
+		</div>
+		<div class="idct-left">
+			<div id="idct-curr">00:00</div><br/>
+			<div id="idct-fps">30</div>
+		</div>
+		<div class="idct-right">
+			<div id="idct-dura">00:00:00</div><br/>
+			<div id="idct-allo" class="idct-yes">A</div>
+			<div id="idct-sub" class="idct-no">S</div>
+			<div id="idct-blob" class="idct-no">B</div>
+			<div id="idct-lib" class="idct-no">L</div>
+		</div>
 	</div>
 </body>

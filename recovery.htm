@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<head>
+	<title>WebMP Recovery</title>
+	<meta name="theme-color" content="#111" />
+	<meta content="true" name="HandheldFriendly"/>
+	<meta content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" name="viewport"/>
+	<meta charset="UTF-8" />
+	<link rel="stylesheet" href="css/recovery.css"/>
+	<script src="js/recovery.js"></script>
+	<link href="img/icon.png" rel="shortcut icon"/>
+</head>
+<body>
+	<div class="tab" id="tab-main">
+		<h3>Recovery</h3>
+		<p>Welcome to WebMP recovery wizard. Choose your action.</p>
+		<form action="">
+			<fieldset id="f-action">
+				<input type="radio" name="i-main" id="i-main-update" /><label for="i-main-update">Update WebMP</label>
+				<br/>
+				<input type="radio" name="i-main" id="i-main-restore" /><label for="i-main-restore">Restore to default</label>
+				<br/>
+				<input type="radio" name="i-main" id="i-main-rcrp" /><label for="i-main-rcrp">Restore via created restore points</label>
+				<br/>
+				<input type="radio" name="i-main" id="i-main-crp" /><label for="i-main-crp">Create a restore point</label>
+			</fieldset>
+		</form>
+	</div>
+	<div class="tab" id="tab-update">
+		<h3>Update</h3>
+		<p>Time to update your WebMP to let it function correctly.</p>
+	</div>
+	<div class="tab" id="tab-finalize">
+		<h3>Working...</h3>
+		<div class="progress">
+			<div class="progress-inner"></div>
+		</div>
+		<div id="final-out"></div>
+	</div>
+	<div class="universal-button-disabled" id="btn-prev">PREV</div>
+	<div class="universal-button" id="btn-next">NEXT</div>
+</body>

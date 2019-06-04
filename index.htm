@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <head>
-	<title>WebMP 0.28</title>
+	<title>WebMP 1.0.0</title>
 	<meta name="theme-color" content="#111" />
 	<meta content="true" name="HandheldFriendly"/>
-	<meta content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" name="viewport"/>
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"/>
 	<meta charset="UTF-8" />
+	<link href="css/font.css" rel="stylesheet"/>
 	<script src="libs/elsl.pre1.js"></script>
 	<link rel="stylesheet" href="css/index.css" />
 	<link rel="manifest" href="wapp/main.json" />
@@ -16,7 +17,25 @@
 	<noscript>Your browser does not support JavaScript.</noscript>
 	<div id="container">
 		<iframe id="tab-core" src="core.htm"></iframe>
-		<iframe id="tab-list" src="playlist.htm"></iframe>
+		<iframe id="tab-list" src="library.htm"></iframe>
 		<iframe id="tab-conf" src="settings.htm"></iframe>
+	</div>
+	<div class="topbar">
+		<img src="img/icon.png" id="window-icon" />
+		<div id="filename">Webcirque WebMP 1.0</div>
+		<img src="img/plain-pure/close.svg" id="window-close"/>
+		<img src="img/plain-pure/plus.svg" id="window-maximize"/>
+		<img src="img/plain-pure/minus.svg" id="window-minimize"/>
+	</div>
+	<div id="tablist">
+	</div>
+	<div id="unsupported">
+		<big>Sorry, but this browser not supported. Please switch to Chrome or Opera, they are better.</big>
+		<br/>
+		<big>抱歉，本浏览器不受支持。请改用Chrome或者Opera浏览器，它们更好。</big>
+		<br/>
+		<big>抱歉，本瀏覽器不受支援。請使用Chrome或者Opera瀏覽器，它們更好。</big>
+		<br/>
+		<big>ごめんなさい。このブラウザ—は支援しない。ChromeやOperaを使って下さい。それはとっても良いですよ。</big>
 	</div>
 </body>

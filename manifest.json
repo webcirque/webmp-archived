@@ -1,24 +1,24 @@
 {
-	"name": "Webcirque WebMP 0.28",
-	"short_name": "WebMP 0.28",
-	"version": "0.28.1.1",
+	"name": "Webcirque WebMP 1.0",
+	"short_name": "WebMP 1.0",
+	"version": "1.0.0.4",
 	"manifest_version": 2,
 	"description": "__MSG_extDescription__",
-	"icons": {
+	/*"icons": {
 		"16": "img/icon.png",
 		"32": "img/icon32.png",
 		"48": "img/icon64.png",
 		"64": "img/icon64.png",
 		"128": "img/icon128.png"
-	},
+	},*/
 	"default_locale": "en",
 	"browser_action": {
-		"default_icon": "img/icon64.png",
-		"default_title": "WebMP 0.28",
+		"default_icon": "img/placeholder.png",
+		"default_title": "WebMP 1.0",
 		"default_popup": "popup.htm"
 	},
 	"homepage_url": "https://pwcq.ml/",
 	"permissions": [
-		"cookies", "geolocation", "notifications", "storage", "unlimitedStorage", "http://*/*", "https://*/*", "http://localhost/*"
+		"cookies", "geolocation", "notifications", "storage", "unlimitedStorage", "http://*/*", "https://*/*", "http://localhost/*", "tabCapture", "file:///*", "notifications", "activeTab", "tabs", "desktopCapture", "webRequest", "webRequestBlocking", "downloads"
 	]
 }
