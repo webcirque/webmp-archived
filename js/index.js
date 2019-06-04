@@ -1,232 +1,124 @@
-// Resize window
-wmpResizeWindow = function () {
-	if (innerWidth >= innerHeight) {
-		wmpMenuBar.style.width = "48px";
-		wmpMenuBar.style.height = "";
-		wmpDisplay.style.width = (innerWidth - 48).toString() + "px";
-		wmpDisplay.style.height = "";
-	} else {
-		wmpMenuBar.style.width = "";
-		wmpMenuBar.style.height = "48px";
-		wmpDisplay.style.width = "";
-		wmpDisplay.style.height = (innerHeight - 48).toString() + "px";
-	}
-}
-// Hide tabs
-hideAllTabs = function () {
-	let count = 0;
-	let target = wmpDisplay.getElementsByTagName("iframe");
-	while (count < target.length) {
-		target[count].style.display = "none";
-		count++;
-	};
-	wmpPlayerCore.style.display = "";
-	wmpPlayerCore.style.filter = "blur(2px)";
-}
-// Full screen
-function toggleFullScreen() {
-	let fullScreenElement = document.webkitFullscreenElement || document.mozFullscreenElement || document.fullscreenElement;
-	if (fullScreenElement) {
-		if (document.mozExitFullscreen) {
-			document.mozExitFullscreen();
-		} else {
-			document.webkitExitFullscreen();
-		};
-	} else {
-		if (document.body.webkitRequestFullscreen) {
-			document.body.webkitRequestFullscreen();
-		} else {
-			document.body.mozRequestFullscreen();
-		};
-	};
-}
+"use strict";
+var recoveryWindow;
 
-if ('serviceWorker' in navigator) {
-	navigator.serviceWorker.register('sw.js').then(function() {
-		console.log("Service Worker Registered"); 
+// Receive messages
+
+// Automatic detects recovery usage
+let versionString = localStorage.getItem("WEBMPS:versionString");
+if (versionString == null || versionString != "1.0") {
+	recoveryWindow = window.open("recovery.htm");
+	setTimeout(() => {
+		recoveryWindow.postMessage({
+			refferedURL: location.href,
+			action: "update"
+		}, "*");
+		addEventListener("message", (event) => {
+			console.log("MSG_RCVED");
+			if (event.data.action = "reload") {
+				location.reload();
+			};
+		});
+	}, 600);
+} else {
+	// Normal actions
+	document.addEventListener("readystatechange", function () {
+		if (this.readyState.toLowerCase() == "interactive") {
+			// Get the framed windows
+			self.frames = {};
+			self.frames.core = document.querySelector("iframe#tab-core");
+			self.frames.list = document.querySelector("iframe#tab-list");
+			self.frames.conf = document.querySelector("iframe#tab-conf");
+			self.frames.container = document.querySelector("div#container");
+			resizeWindow();
+			// Auto resizing
+			addEventListener("resize", resizeWindow);
+			if (self.TabSearch) {
+				let actions = new TabSearch(location.search);
+				let appendString = "?";
+				for (let name in actions) {
+					switch (name) {
+						case "nowa": {
+							if (actions[name] != "0") {
+								appendString += "&nowa=1";
+								console.info("WebAudio is disabled via search.");
+							};
+							break;
+						};
+						case "file": {
+							appendString += "&file=$1".replace("$1", actions[name]);
+							console.info("Queried file [$1] via search.".replace("$1", actions[name]));
+							break;
+						};
+						case "start": {
+							appendString += "&start=$1".replace("$1", actions[name]);
+							console.info("Scheduled file start point [$1] via search.".replace("$1", actions[name]));
+							break;
+						};
+						case "shareid": {
+							appendString += "&shareid=$1".replace("$1", actions[name]);
+							console.info("Queried shared file [$1] via search.".replace("$1", actions[name]));
+							break;
+						};
+						case "debug": {
+							switchTab(actions[name]);
+							console.info("Debugging [$1] tab interface.".replace("$1", actions[name]));
+							break;
+						};
+						case "theme": {
+							appendString += "&theme=$1".replace("$1", actions[name]);
+							console.info("Required theme [$1] via search.".replace("$1", actions[name]));
+							break;
+						};
+					};
+				};
+				appendString = appendString.replace("&", "");
+				self.frames.core.src = "core.htm" + appendString;
+			};
+			//Dragging
+			document.body.addEventListener("dragenter", function (e) {
+				e.preventDefault();
+				e.stopPropagation();
+			}, true);
+			document.body.addEventListener("dragover", function (e) {
+				e.preventDefault();
+				e.stopPropagation();
+			}, true);
+			document.body.addEventListener("dragleave", function (e) {
+				e.preventDefault();
+				e.stopPropagation();
+			}, true);
+			document.body.addEventListener("drop", function (e) {
+				e.preventDefault();
+				e.stopPropagation();
+			}, true);
+		}
 	});
 }
 
-// Load document
-document.addEventListener("readystatechange", function () {
-	if (this.readyState.toLowerCase() == "interactive") {
-		// Load elements
-		wmpMenuBar = document.getElementById("menubar");
-		wmpMenuBar.btnList = Array.from(wmpMenuBar.getElementsByTagName("div"));
-		wmpDisplay = document.getElementById("display");
-		wmpPlayerCore = document.getElementById("player-core");
-		wmpSettingsTab = document.getElementById("settings-tab");
-		wmpPlaylistTab = document.getElementById("playlist-tab");
-		window.onresize = wmpResizeWindow;
-		wmpResizeWindow();
-		// Receive data
-		addEventListener("message", function (ev) {
-			granted = true;
-			switch (ev.data.type.split(":")[0]) {
-				case "info": {
-					switch (ev.data.type) {
-						case "info:player-core": {
-							granted = false;
-							coreData = ev.data;
-							document.title = coreData.title;
-							if (coreData.media) {
-								wmpPlaylistTab.contentWindow.postMessage({
-									"specify": "nowPlayingMedia",
-									"data": coreData.media
-								}, "*");
-							};
-						};
-						default: {
-						}
-					}
-					break;
-				};
-				case "forward": {
-					switch (ev.data.type) {
-						case "forward:player-core": {
-							wmpPlayerCore.contentWindow.postMessage(ev.data.data, "*");
-							break;
-						};
-						case "forward:settings": {
-							wmpSettingsTab.contentWindow.postMessage(ev.data.data, "*");
-							break;
-						};
-						case "forward:playlist": {
-							wmpPlaylistTab.contentWindow.postMessage(ev.data.data, "*");
-							break;
-						};
-					}
-					break;
-				};
-				case "jump": {
-					let count = 0;
-					while (count < wmpMenuBar.btnList.length) {
-						wmpMenuBar.btnList[count].className = "tab-item";
-						count++;
-					};
-					switch (ev.data.type) {
-						case "jump:settings": {
-							hideAllTabs();
-							wmpMenuBar.btnList[3].className = "tab-item-active";
-							document.getElementById("settings-tab").style.display = "";
-						};
-					}
-					break;
-				};
-				case "output": {
-					window.open("data:text/csv," + encodeURIComponent(ev.data.data));
-					break;
-				};
-				case "ready": {
-					switch (ev.data.type) {
-						case "ready:player-core": {
-							if (ev.data.specify == "requireBasic") {
-								let visualizerSetup = localStorage.getItem("WEBMPS:visualizer");
-								if (new Boolean(visualizerSetup)) {
-									wmpPlayerCore.contentWindow.postMessage({
-										"type": "info:settings",
-										"specify": "changeVisualizerMode",
-										"data": visualizerSetup.toLowerCase()
-									}, "*");
-									console.warn("Visualizer: " + visualizerSetup);
-								} else {
-									console.info("No visualizer set.");
-								}
-							}
-							break;
-						}
-					};
-					break;
-				};
-				case "fullSc": {
-					toggleFullScreen();
-					break;
-				};
-			}
-			if (window.debugMode && window.granted) {
-				console.info(ev.data);
-			}
-		});
-		// Actions for items
-		let wmpMenuBarCount = 0;
-		while (wmpMenuBarCount < wmpMenuBar.btnList.length) {
-			wmpMenuBar.btnList[wmpMenuBarCount].addEventListener("mouseup", function () {
-				let count = 0;
-				while (count < wmpMenuBar.btnList.length) {
-					wmpMenuBar.btnList[count].className = "tab-item";
-					count++;
-				};
-				this.className = "tab-item-active";
-			});
-			wmpMenuBarCount++;
-		}
-		wmpMenuBar.btnList[0].addEventListener("mouseup", function () {
-			hideAllTabs();
-			document.getElementById("start-tab").style.display = "";
-		});
-		wmpMenuBar.btnList[2].addEventListener("mouseup", function () {
-			hideAllTabs();
-			document.getElementById("playlist-tab").style.display = "";
-		});
-		wmpMenuBar.btnList[3].addEventListener("mouseup", function () {
-			hideAllTabs();
-			document.getElementById("settings-tab").style.display = "";
-		});
-		wmpMenuBar.btnList[1].addEventListener("mouseup", function () {
-			hideAllTabs();
-			wmpPlayerCore.style.filter = "";
-		});
-		wmpMenuBar.btnList[1].addEventListener("contextmenu", function () {
-			toggleFullScreen();
-		});
-		// Pass information to core
-		// Pass search queries
-		if (window.TabSearch) {
-			let wmpPassParam = TabSearch(location.search);
-			let wmpPlayerCorePath = "core.htm?";
-			if (wmpPassParam.file) {
-				wmpPlayerCorePath += "file=" + wmpPassParam.file;
-			}
-			if (wmpPassParam.start) {
-				if (wmpPlayerCorePath != "core.htm?") {
-					wmpPlayerCorePath += "&";
-				}
-				wmpPlayerCorePath += "start=" + wmpPassParam.start;
-			}
-			if (JSON.stringify(wmpPassParam) != "{\"\":\"undefined\"}") {
-				wmpPlayerCore.src = wmpPlayerCorePath;
-			}
-		}
-		// Pass file info
-		document.body.addEventListener("dragenter", function (e) {
-			wmpPlayerCore.style.display = "none";
-			e.preventDefault();
-			e.stopPropagation();
-		}, true);
-		document.body.addEventListener("dragover", function (e) {
-			e.preventDefault();
-			e.stopPropagation();
-		}, true);
-		document.body.addEventListener("dragleave", function (e) {
-			wmpPlayerCore.style.display = "";
-			e.preventDefault();
-			e.stopPropagation();
-		}, true);
-		document.body.addEventListener("drop", function (e) {
-			wmpPlayerCore.style.display = "";
-			e.preventDefault();
-			e.stopPropagation();
-			let count = 0;
-			let df = e.dataTransfer;
-			wmpPlayerCore.contentWindow.postMessage({
-				"type": "info:gui",
-				"specify": "playBlobMedia",
-				"data": df.files
-			}, "*");
-		}, true);
-		// Disable all menu queries
-		document.oncontextmenu = () => {
-			return false;
+function switchTab(tabName) {
+	for (let name in frames) {
+		if (name == tabName) {
+			frames[name].style.display = "block";
+		} else if (name != "core" && name != "container") {
+			frames[name].style.display = "none";
 		};
-	}
-});
+	};
+	if (tabName != "core") {
+		if (self.globalConfig) {
+			if (globalConfig.aero) {
+				frames.core.style.filter = "blur(4px)";
+			} else {
+				frames.core.style.display = "none";
+			};
+		};
+	} else {
+		frames.core.style.filter = "";
+		frames.core.style.display = "";
+	};
+};
+function resizeWindow() {
+	if (self.frames) {
+		frames.container.style.height = (innerHeight - 24).toString() + "px";
+		frames.list.style.height = (innerHeight - 96).toString() + "px";
+	};
+};
