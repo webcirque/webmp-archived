@@ -12,3 +12,5 @@ Can run on Windows XP/Vista/7/8/8.1/10, Android 6.0+, Ubuntu 16+ and other OS. C
 PS: _Firefox does not support some features._
 
 Project page at [Project Webcirque Website](https://www.pwcq.ml/project/webmp). Please read full description there.
+
+Get FLV [https://api.bilibili.com/x/player/playurl?avid=58451592&cid=101951691&qn=64&type=&otype=json]
