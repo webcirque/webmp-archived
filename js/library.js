@@ -8,7 +8,26 @@ document.addEventListener("readystatechange", function () {
 		self.area.operation = document.querySelector("div#operation");
 		self.tabs = {};
 		self.lfworker = new Worker("js/libraryFileWorker.js");
+		addEventListener("resize", resizeWindow);
+		themeIconChange("black");
 		resizeWindow();
+		requestLanguage();
+		if (self.TabSearch) {
+			let actions = new TabSearch(location.search);
+			for (let name in actions) {
+				switch (name) {
+					case "shareid": {
+						console.info("Queried shared file [$1] via search.".replace("$1", actions[name]));
+						break;
+					};
+					case "theme": {
+						themeIconChange(actions[name]);
+						console.info("Changed theme to [$1] via search.".replace("$1", actions[name]));
+						break;
+					};
+				};
+			};
+		};
 	}
 });
 
@@ -70,3 +89,15 @@ self.lfw = {
 		this.size = size;
 	}
 };
+
+function replaceAttr(nodes, attr, text) {
+	if (nodes.constructor != Array) {
+		nodes = Array.from(nodes);
+	};
+	nodes.forEach((e) => {
+		e[attr] = text;
+	});
+}
+function updateLanguageAssets() {
+	replaceAttr(document.getElementsByClassName("input-text-search"), "placeholder", lang.search);
+}

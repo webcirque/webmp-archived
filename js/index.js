@@ -2,6 +2,21 @@
 var recoveryWindow;
 
 // Receive messages
+addEventListener("message", function (msg) {
+	switch (msg.data.spec) {
+		case "switchTab": {
+			switchTab(msg.data.data.context);
+			break;
+		};
+		case "fullscreen": {
+			letFullscreen();
+			break;
+		};
+		default: {
+			console.warn(lang.noMsgSpec.replace("$1", msg.data.spec));
+		};
+	};
+});
 
 // Automatic detects recovery usage
 let versionString = localStorage.getItem("WEBMPS:versionString");
@@ -29,6 +44,19 @@ if (versionString == null || versionString != "1.0") {
 			self.frames.list = document.querySelector("iframe#tab-list");
 			self.frames.conf = document.querySelector("iframe#tab-conf");
 			self.frames.container = document.querySelector("div#container");
+			document.addEventListener("webkitfullscreenchange", function () {
+				let fsc = false;
+				if (document.webkitFullscreenElement) {
+					fsc = true;
+				};
+				frames.core.contentWindow.postMessage({
+					spec: "info",
+					data: {
+						type: "fullscreen",
+						context: fsc
+					}
+				}, "*");
+			});
 			resizeWindow();
 			// Auto resizing
 			addEventListener("resize", resizeWindow);
@@ -73,6 +101,7 @@ if (versionString == null || versionString != "1.0") {
 				};
 				appendString = appendString.replace("&", "");
 				self.frames.core.src = "core.htm" + appendString;
+				self.frames.list.src = "library.htm" + appendString;
 			};
 			//Dragging
 			document.body.addEventListener("dragenter", function (e) {
@@ -122,3 +151,19 @@ function resizeWindow() {
 		frames.list.style.height = (innerHeight - 96).toString() + "px";
 	};
 };
+function letFullscreen() {
+	let fsc = false;
+	if (document.webkitFullscreenElement) {
+		document.webkitExitFullscreen();
+	} else {
+		frames.container.webkitRequestFullscreen();
+		fsc = true;
+	};
+	frames.core.contentWindow.postMessage({
+		spec: "info",
+		data: {
+			type: "fullscreen",
+			context: fsc
+		}
+	}, "*");
+}

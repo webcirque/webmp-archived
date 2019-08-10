@@ -1,6 +1,15 @@
 // Receive messages
-addEventListener("message", function (msgEvt) {
-	// Receive meta
+addEventListener("message", function (msg) {
+	switch (msg.data.spec) {
+		case "info": {
+			states[msg.data.data.type] = msg.data.data.context;
+			fireCustomStates();
+			break;
+		};
+		default: {
+			console.warn(lang.noMsgSpec.replace("$1", msg.data.spec));
+		};
+	};
 });
 // When WebMP is ready
 document.addEventListener("readystatechange", function () {
@@ -51,6 +60,8 @@ document.addEventListener("readystatechange", function () {
 		video.addEventListener("durationchange", function () {
 			element.indicators.duration.innerHTML = nte(video.duration);
 		});
+		element.controllers.list.addEventListener("click", switchLibrary);
+		element.controllers.fsc.addEventListener("click", reqFsc);
 		video.addEventListener("readystatechange", function () {
 			switch (this.readyState) {
 				case video.HAVE_NOTHING: {
@@ -476,5 +487,43 @@ function changeTitle(type, context) {
 			type: type,
 			context: context
 		}
-	});
+	}, "*");
+}
+
+function switchLibrary() {
+	if (self.states.list == undefined) {
+		states.list = false;
+	};
+	if (states.list) {
+		top.postMessage({
+			spec: "switchTab",
+			data: {
+				context: "core"
+			}
+		}, "*");
+	} else {
+		top.postMessage({
+			spec: "switchTab",
+			data: {
+				context: "list"
+			}
+		}, "*");
+	};
+	states.list = !(states.list);
+}
+function reqFsc() {
+	top.postMessage({
+		spec: "fullscreen"
+	}, "*");
+}
+
+function fireCustomStates() {
+	let element = getAll();
+	if (states.fullscreen) {
+		element.controllers.fsc.children[0].style.display = "none";
+		element.controllers.fsc.children[1].style.display = "";
+	} else {
+		element.controllers.fsc.children[1].style.display = "none";
+		element.controllers.fsc.children[0].style.display = "";
+	};
 }

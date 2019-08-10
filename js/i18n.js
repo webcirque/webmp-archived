@@ -50,12 +50,15 @@ function requestLanguage() {
 		fileLoading: "Loading local file [$1]",
 		formatDetected: "Detected file format as [$1], type as [$2].",
 		unsupportedFileType: "File extension [$1] with type [$2] is not supported.",
-		keyPressed: "Key [$1] is pressed by user."
+		keyPressed: "Key [$1] is pressed by user.",
+		search: "Enter keywords and search...",
+		noMsgSpec: "No message specification \"$1\""
 	};
 	switch (preferredIndex) {
 		case 0: {
 			lang.threadOnline = "已启动[$1]线程，每秒执行$2次";
 			lang.methodInvalid = "方法\"$1\"不可用";
+			lang.search = "键入关键词以搜索...";
 			break;
 		};
 		case 1:
@@ -71,6 +74,9 @@ function requestLanguage() {
 		case 7: {
 			break;
 		};
+	};
+	if (self.updateLanguageAssets) {
+		updateLanguageAssets();
 	};
 };
 
