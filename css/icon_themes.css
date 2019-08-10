@@ -16,3 +16,37 @@ body.theme-greenb * {
 body.theme-blueb * {
 	color: #3367d6;
 }
+body.theme-classic .universal-highlight,
+body.theme-black .universal-highlight,
+body.theme-greend .universal-highlight,
+body.theme-blued .universal-highlight {
+	background-color: rgba(255, 255, 255, 0.2);
+}
+body.theme-white .universal-highlight,
+body.theme-greenb .universal-highlight,
+body.theme-blueb .universal-highlight {
+	background-color: rgba(0, 0, 0, 0.2);
+}
+
+body.theme-classic, body.theme-black, body.theme-greend, body.theme-blued {
+	 color: #fff;
+	 background: rgba(0, 0, 0, 0.3);
+}
+body.theme-white, body.theme-greenb, body.theme-blueb {
+	 color: #000;
+	 background: rgba(255, 255, 255, 0.3);
+}
+
+body.theme-classic div.universal-border,
+body.theme-black div.universal-border,
+body.theme-blued div.universal-border,
+body.theme-greend div.universal-border {
+	border: 1px solid #fff;
+	background: rgba(0, 0, 0, 0.36);
+}
+body.theme-white div.universal-border,
+body.theme-blueb div.universal-border,
+body.theme-greenb div.universal-border {
+	border: 1px solid #000;
+	background: rgba(255, 255, 255, 0.2);
+}

@@ -22,6 +22,8 @@ div {
 	height: 100%;
 	top: 0;
 	right: 0;
+	overflow-x: hidden;
+	overflow-y: auto;
 }
 #operation {
 	right: 0;
@@ -65,3 +67,94 @@ div {
 * {
 	background: rgba(255, 255, 255, 0.1);
 } */
+
+.tabs-search {
+	display: flex;
+}
+input[id^=search-] {
+	outline: none;
+	flex: 1;
+	background: rgba(0, 0, 0, 0.4);
+	border: 1px solid rgba(255, 255, 255, 0.6);
+	border-radius: 4px;
+	height: 22px;
+	font-size: 15px;
+	color: #fff;
+	opacity: 0.7;
+	margin: 4px;
+	padding: 2px;
+	font-family: "Verdana", VerdanaWeb, "Microsoft Yahei", "Microsoft Yahei UI", MicrosoftYaheiWeb;
+}
+img.img-search {
+	width: 22px;
+	height: 22px;
+	margin: 6px;
+	margin-left: 0;
+}
+div.tab-card-ban {
+	height: 128px;
+	flex: none;
+	margin: 4px;
+}
+div.tab-card-vid {}
+img.tab-card-banimg {
+	height: 128px;
+	float: left;
+}
+.tab-card-vidimg {
+	width: 160px;
+	position: relative;
+	display: block;
+}
+div.tab-card-ext {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	padding: 2px 4px;
+	border: 0 solid;
+	background: rgba(0, 0, 0, 0.4);
+	border-top-left-radius: 2px;
+}
+div.tab-card-title {
+	font-weight: bold;
+	font-size: 18px;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	width: 100%;
+	display: inline;
+	padding: 4px;
+}
+div.tab-card-score {
+	color: orange;
+	font-size: 18px;
+	float: right;
+	padding: 4px;
+}
+div.tab-card-item {
+	width: 160px;
+	height: 130px;
+	font-size: 12px;
+	float: left;
+	margin: 4px;
+	padding: 2px;
+	border-radius: 4px;
+}
+div.tab-card-vid {
+	text-overflow: ellipsis;
+	overflow: hidden;
+	-webkit-line-clamp: 2;
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	padding: 1px;
+}
+div.tab-card-desc {
+	flex: none;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	padding: 4px;
+	height: 94px;
+	-webkit-line-clamp: 5;
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+}

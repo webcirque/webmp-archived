@@ -7,6 +7,10 @@ body {
 	font-size: 16px !important;
 	font-family: "Verdana", VerdanaWeb, "Microsoft Yahei", "Microsoft Yahei UI", MicrosoftYaheiWeb
 }
+body.theme-white, body.theme-greenb, body.theme-blueb {
+	 color: #000;
+	 background: rgba(255, 255, 255, 1) !important;
+}
 
 /* Maximum video size */
 div.video-container,
@@ -20,8 +24,8 @@ video {
 
 /* Light theme and dark theme */
 body.theme-classic, body.theme-black, body.theme-greend, body.theme-blued {
-	 color: #fff;
-	 background: #000;
+	 color: #fff !important;
+	 background: #000 !important;
 }
 body.theme-classic .topbar,
 body.theme-black .topbar,
