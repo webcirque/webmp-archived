@@ -1,0 +1,60 @@
+All require cookies, referer and origin
+Referer: https://www.bilibili.com/bangumi/play or https://www.bilibili.com/video
+
+Bilibili user login info API
+https://api.bilibili.com/x/web-interface/nav
+
+Episodes
+https://api.bilibili.com/pgc/web/season/section?season_id=$1
+$1 Season ID
+
+Search (need manual parse)
+https://search.bilibili.com/all?keyword=$1&page=$2
+$1 Word
+$2 Page
+PS: Get bangumi from .bangumi-item-wrap, get video from .video
+
+Get danmaku for video
+https://api.bilibili.com/x/v1/dm/list.so?oid=$1
+$1 CID(Chat ID)
+
+Bangumi Cover
+https://i0.hdslb.com/bfs/bangumi/$1.jpg@$2.webp
+$1 Cover Id
+$2 Size: 450w_600h 260w_350h 130w_175h
+
+EP Info (need manual parse)
+https://www.bilibili.com/bangumi/media/md$1/
+$1 Season ID
+
+Get related bangumi
+https://api.bilibili.com/x/web-interface/archive/related?aid=$1
+$1 AID(AVID)
+
+Get recommend bangumi
+https://api.bilibili.com/pgc/web/recommend/related/recommend?season_id=$1
+$1 Season ID
+
+Get bangumi video url
+https://api.bilibili.com/pgc/player/web/playurl?avid=$1&cid=$2&type=&otype=json&ep_id=$3&qn=$4
+$1 AVID
+$2 CID
+$3 Ep ID
+$4 Quality number (0 for unlogged auto, 16 for 360p, 32 for 480p, 64 for 720p, 80 for 1080p)
+
+Get web token
+https://bangumi.bilibili.com/web_api/get_token
+
+Get all episodes in bangumi
+https://bangumi.bilibili.com/web_api/get_ep_list?season_id=$1&season_type=1
+$1 Season ID
+
+Directly get video info
+https://www.bilibili.com/video/av$1
+$1 AVID
+
+Get normal video url
+https://api.bilibili.com/x/player/playurl?avid=$1&cid=$2&qn=$3
+$1 AVID
+$2 CID
+$3 Quality number (0 for unlogged auto, 16 for 360p, 32 for 480p, 64 for 720p, 80 for 1080p)
