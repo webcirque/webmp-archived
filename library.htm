@@ -10,8 +10,14 @@
 	<script src="js/i18n.js"></script>
 	<script src="js/mediaSearchPack.js"></script>
 	<script src="js/icon_themes.js"></script>
-	<link rel="stylesheet" href="css/library.css"></script></script>
-	<link rel="stylesheet" href="css/font.css"></script></script>
+	<script type="text/javascript"></script>
+	<script src="libs/elsl.pre1.js"> </script>
+	<script src="libs/cryptojs/crypto.js"></script>
+	<script src="libs/cryptojs/sha1.js"></script>
+	<script src="libs/jsmediatags.min.js"></script>
+	<link rel="stylesheet" href="css/library.css" />
+	<link rel="stylesheet" href="css/icon_themes.css" />
+	<link rel="stylesheet" href="css/font.css" />
 	<link href="img/icon.png" rel="shortcut icon"/>
 </head>
 <body>
@@ -20,14 +26,10 @@
 			<li><b>Search</b></li>
 			<li><ul>
 				<li>QQMusic</li>
-				<li>Spotify</li>
 				<li>YouTube</li>
-				<li>NCMusic</li>
-				<li>Kugou</li>
-				<li>Kuwo</li>
 				<li>YIFY</li>
 				<li>YIFY-Subs</li>
-				<li>RARBG</li>
+				<li class="option-current universal-highlight">Bilibili</li>
 			</ul></li>
 			<li><b>Playlist</b></li>
 			<li><ul>
@@ -43,6 +45,56 @@
 			</ul></li>
 		</ul>
 	</div>
-	<div id="tabs"></div>
+	<div id="tabs">
+		<div class="tab" id="tab-bilibili">
+			<div class="tabs-search">
+				<input id="search-bilibili" class="input-text-search" />
+				<img src="img/plain-pure/search.svg" class="img-search" />
+			</div>
+			<div class="tabs-display">
+				<div id="display-bangumi">
+					<div class="tab-card-ban universal-border">
+						<img class="tab-card-banimg" src="http://i0.hdslb.com/bfs/bangumi/da72a302f6512361e9954852952ea92130b8dc93.jpg@180w_240h.webp" />
+						<div class="tab-card-title">
+							My Little Pony: Season 4 (我的小马驹)
+						</div>
+						<div class="tab-card-score">
+							9.7
+						</div>
+						<div class="tab-card-desc">
+	简介：动画讲述了一只名叫做暮光闪闪/紫悦（Twilight Sparkle）的独角兽，要执行她导师塞拉斯缇娅公主/宇宙公主（Princess Celestia）的任务，在小马镇/小马谷（Ponyville）学习关于友谊的知识。她与另外五只小马，苹果杰克/苹果嘉儿（Applejack）、瑞瑞/珍奇（Rarity）、云宝黛西/云宝（Rainbow Dash）、小蝶/柔柔（Fluttershy）与萍琪/碧琪（Pinkie Pie），成为最要好的朋友。每只小马都分别代表了友谊的6个元素：诚实，慷慨，忠心，善良，欢笑，魔法，并在谐率水晶/和谐之元（Elements of Harmony）中，各自扮演着属于自己的重要角色。在动画中，随时可见她们在小马镇/小马谷（Ponyville）的种种冒险、奇遇、日常等等。同时，也在她们之间的互动和冲突中，寻找着最适合最合理的完美解决方案。
+
+	“尽管小马国并不太平，六位主角之间也常常有这样那样的问题，但是他们之间的真情对代，使得这个童话世界已经成为不少人心中理想的世外桃源。”
+						</div>
+					</div>
+					<div class="tab-card-ban universal-border">
+						<img class="tab-card-banimg" src="http://i0.hdslb.com/bfs/bangumi/da72a302f6512361e9954852952ea92130b8dc93.jpg@180w_240h.webp" />
+						<div class="tab-card-title">
+							My Little Pony: Season 4 (我的小马驹)
+						</div>
+						<div class="tab-card-score">
+							9.7
+						</div>
+						<div class="tab-card-desc">
+	简介：动画讲述了一只名叫做暮光闪闪/紫悦（Twilight Sparkle）的独角兽，要执行她导师塞拉斯缇娅公主/宇宙公主（Princess Celestia）的任务，在小马镇/小马谷（Ponyville）学习关于友谊的知识。她与另外五只小马，苹果杰克/苹果嘉儿（Applejack）、瑞瑞/珍奇（Rarity）、云宝黛西/云宝（Rainbow Dash）、小蝶/柔柔（Fluttershy）与萍琪/碧琪（Pinkie Pie），成为最要好的朋友。每只小马都分别代表了友谊的6个元素：诚实，慷慨，忠心，善良，欢笑，魔法，并在谐率水晶/和谐之元（Elements of Harmony）中，各自扮演着属于自己的重要角色。在动画中，随时可见她们在小马镇/小马谷（Ponyville）的种种冒险、奇遇、日常等等。同时，也在她们之间的互动和冲突中，寻找着最适合最合理的完美解决方案。
+
+	“尽管小马国并不太平，六位主角之间也常常有这样那样的问题，但是他们之间的真情对代，使得这个童话世界已经成为不少人心中理想的世外桃源。”
+						</div>
+					</div>
+				</div>
+				<div id="display-normvid">
+					<div class="tab-card-item universal-border">
+						<div class="tab-card-vidimg">
+							<img class="tab-card-vidimg" src="http://i2.hdslb.com/bfs/archive/5f12aee69b195e80d592b7b00e7e46d1a0bb6328.jpg@320w_200h.webp" />
+							<div class="tab-card-ext">00:00</div>
+						</div>
+						<div class="tab-card-vid">
+							This is a video description. Lorem ipsem dolor sit amet
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 	<div id="operation" class="operation-collapsed"></div>
 </body>
