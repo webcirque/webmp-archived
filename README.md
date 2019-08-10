@@ -3,7 +3,9 @@ Webcirque Media Player. Works best on Chrome 59+, and latest Opera versions.
 
 Licensed under Apache 2.0 License.
 
-<b>Download latest build [0.28.0.20190207](https://www.pwcq.ml/projects/webmp/builds/0.28.0.20190207.zip) on our website</b> (_Recommended_)! You can also test it [online](https://webcirque.github.io/webmp).
+<b>Download latest build [1.0.7.10](https://www.pwcq.ml/projects/webmp/builds/1.0.7.10.zip) on our website</b> (_Recommended_)!
+
+You can also test it [online](https://webcirque.github.io/webmp), but CORS will restrict it.
 
 Please post bugs and suggestions here: [GitHub Issues](https://github.com/webcirque/webmp/issues).
 
