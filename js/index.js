@@ -190,11 +190,11 @@ function updateTheme(color) {
 				break;
 			};
 			case "greenb": {
-				metaTheme.content = "#29d301";
+				metaTheme.content = "#00c000";
 				break;
 			};
 			default: {
-				metaTheme.content = color;
+				metaTheme.content = color.replace("-", "#");
 			};
 		};
 	};
