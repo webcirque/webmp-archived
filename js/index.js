@@ -173,7 +173,7 @@ function letFullscreen() {
 	}, "*");
 };
 function updateTheme(color) {
-	let metaTheme = document.querySelector("theme-color-meta");
+	let metaTheme = document.querySelector("#theme-color-meta");
 	if (metaTheme) {
 		switch (color) {
 			case "dafault":
