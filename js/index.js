@@ -186,7 +186,7 @@ function updateTheme(color) {
 				break;
 			};
 			case "blueb": {
-				metaTheme.content = "#336d76";
+				metaTheme.content = "#3367d6";
 				break;
 			};
 			case "greenb": {
