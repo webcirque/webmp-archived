@@ -190,7 +190,7 @@ function updateTheme(color) {
 				break;
 			};
 			case "greenb": {
-				metaTheme.content = "#00a700";
+				metaTheme.content = "#00a000";
 				break;
 			};
 			default: {
