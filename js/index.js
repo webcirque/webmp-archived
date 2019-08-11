@@ -12,6 +12,10 @@ addEventListener("message", function (msg) {
 			letFullscreen();
 			break;
 		};
+		case "themeChange": {
+			updateTheme(msg.data.data.context);
+			break;
+		};
 		default: {
 			console.warn(lang.noMsgSpec.replace("$1", msg.data.spec));
 		};
@@ -94,6 +98,7 @@ if (versionString == null || versionString != "1.0") {
 						};
 						case "theme": {
 							appendString += "&theme=$1".replace("$1", actions[name]);
+							updateTheme(actions[name]);
 							console.info("Required theme [$1] via search.".replace("$1", actions[name]));
 							break;
 						};
@@ -166,4 +171,31 @@ function letFullscreen() {
 			context: fsc
 		}
 	}, "*");
+};
+function updateTheme(color) {
+	let metaTheme = document.querySelector("theme-color-meta");
+	if (metaTheme) {
+		switch (color) {
+			case "dafault":
+			case "black": {
+				metaTheme.content = "#111";
+				break;
+			};
+			case "white": {
+				metaTheme.content = "#f7f7f7";
+				break;
+			};
+			case "blueb": {
+				metaTheme.content = "#10a0ff";
+				break;
+			};
+			case "greenb": {
+				metaTheme.content = "#0d0";
+				break;
+			};
+			default: {
+				metaTheme.content = color;
+			};
+		};
+	};
 }
