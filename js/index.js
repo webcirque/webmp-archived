@@ -186,11 +186,11 @@ function updateTheme(color) {
 				break;
 			};
 			case "blueb": {
-				metaTheme.content = "#10a0ff";
+				metaTheme.content = "#336d76";
 				break;
 			};
 			case "greenb": {
-				metaTheme.content = "#0d0";
+				metaTheme.content = "#29d301";
 				break;
 			};
 			default: {
