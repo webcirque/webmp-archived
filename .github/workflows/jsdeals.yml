@@ -1,3 +1,4 @@
+name: jsdeals
 on: 
   schedule:
     - cron: '*/10 * * * *'
