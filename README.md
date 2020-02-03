@@ -1,4 +1,7 @@
 # webmp
+
+![.github/workflows/push_jsdeals.yml](https://github.com/webcirque/webmp/workflows/.github/workflows/push_jsdeals.yml/badge.svg)
+
 Webcirque Media Player. Works best on Chrome 59+, and latest Opera versions.
 
 Licensed under Apache 2.0 License.
@@ -11,8 +14,8 @@ Please post bugs and suggestions here: [GitHub Issues](https://github.com/webcir
 
 Can run on Windows XP/Vista/7/8/8.1/10, Android 6.0+, Ubuntu 16+ and other OS. Can be loaded as a Chrome extension. (_Maybe Opera and Firefox_)
 
-PS: _Firefox does not support some features._
+PS: _Older Firefox versions seems not to support some features._
 
-Project page at [Project Webcirque Website](https://www.pwcq.ml/project/webmp). Please read full description there.
+Project page at [Project Webcirque Website](https://www.pwcq.dev/project/webmp). Please read full description there.
 
 Get FLV [https://api.bilibili.com/x/player/playurl?avid=58451592&cid=101951691&qn=64&type=&otype=json]
