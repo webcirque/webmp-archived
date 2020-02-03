@@ -8,6 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     name: Get all JS files processed
     steps:
+    - name: Raise permission
+      run: sudo su
+      timeout-minutes: 1
     - name: Install UglifyJS-ES
       run: npm install uglify-es -g
     - name: Install UglifyJS
