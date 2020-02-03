@@ -8,8 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     name: Get all JS files processed
     steps:
-    - name: Raise permission
-      run: sudo su
+    - name: Setup Node.js for use with actions
+      uses: actions/setup-node@v1.1.0
       timeout-minutes: 1
     - name: Install UglifyJS-ES
       run: npm install uglify-es -g
