@@ -1,12 +1,12 @@
 name: jsdeals
 on: 
-  push:
-    branches: 
-      - master
-    paths:
-      - 'js/dev/*'
-#  schedule:
-#    - cron: '0 12 * * *'
+#  push:
+#    branches: 
+#      - master
+#    paths:
+#      - 'js/dev/*'
+  schedule:
+    - cron: '0 7 * * 1'
 
 jobs:
   push_jsdeals:
