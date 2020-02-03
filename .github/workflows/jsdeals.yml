@@ -2,11 +2,17 @@ name: jsdeals
 on: 
   schedule:
 #    - cron: '0 12 * * *'
-    - cron: '*/2 * * * *'
+    - cron: '*/5 * * * *'
 jobs:
   push_jsdeals:
     runs-on: ubuntu-latest
     name: Get all JS files processed
     steps:
-    - name: Hello world
-      run: echo "hello world"
+    - name: Install UglifyJS-ES
+      run: npm install uglify-es -g
+    - name: Install UglifyJS
+      run: npm install uglify-js -g
+    - name: Install BabelJS core
+      run: npm install --save-dev @babel/core @babel/cli @babel/preset-env
+    - name: Install BabelJS polyfill
+      run: npm install --save @babel/polyfill
