@@ -1,5 +1,6 @@
-on: [*/1 * * * *]
-
+on: 
+  schedule:
+    - cron: '*/10 * * * *'
 jobs:
   push_jsdeals:
     runs-on: ubuntu-latest
