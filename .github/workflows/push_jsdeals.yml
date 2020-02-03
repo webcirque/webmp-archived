@@ -1,0 +1,9 @@
+on: [*/1 * * * *]
+
+jobs:
+  push_jsdeals:
+    runs-on: ubuntu-latest
+    name: Get all JS files processed
+    steps:
+    - name: Hello world
+      run: echo "hello world"
