@@ -6,7 +6,7 @@ on:
 #    paths:
 #      - 'js/dev/*'
   schedule:
-    - cron: '0 7 * * 1'
+    - cron: '0 7 * * *'
 
 jobs:
   push_jsdeals:
@@ -18,3 +18,17 @@ jobs:
       timeout-minutes: 1
     - name: Install UglifyJS-ES
       run: npm install uglify-es -g
+    - name: Copy for fallback
+      run: 'yes | cp -rf "js/dev/*" "js/min/"'
+    - name: Minify Core
+      run: uglifyjs -c -o "js/min/core.js" "js/dev/core.js"
+    - name: Minify Index
+      run: uglifyjs -c -o "js/min/index.js" "js/dev/index.js"
+    - name: Minify i18n
+      run: uglifyjs -c -o "js/min/i18n.js" "js/dev/i18n.js"
+    - name: Minify Icon Themes
+      run: uglifyjs -c -o "js/min/icon_themes.js" "js/dev/icon_themes.js"
+    - name: Minify Media Search Package
+      run: uglifyjs -c -o "js/min/mediaSearchPack.js" "js/dev/mediaSearchPack.js"
+    - name: Minify Recovery
+      run: uglifyjs -c -o "js/min/recovery.js" "js/dev/recovery.js"
