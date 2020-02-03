@@ -1,6 +1,6 @@
 # webmp
 
-![.github/workflows/push_jsdeals.yml](https://github.com/webcirque/webmp/workflows/.github/workflows/push_jsdeals.yml/badge.svg)
+![jsdeals](https://github.com/webcirque/webmp/workflows/jsdeals/badge.svg)
 
 Webcirque Media Player. Works best on Chrome 59+, and latest Opera versions.
 
