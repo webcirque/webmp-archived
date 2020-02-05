@@ -22,6 +22,7 @@ jobs:
 #     run: sudo apt -y install tree
     - name: Show all directories
       run: dir -a
+      working-directory: ${{github.workspace}}
     - name: Copy for fallback
       run: 'yes | cp -a "js/dev/." "js/min/"'
     - name: Minify Core
