@@ -19,7 +19,7 @@ jobs:
     - name: Install UglifyJS-ES
       run: npm install uglify-es -g
     - name: Copy for fallback
-      run: 'yes | cp -rf "js/dev/*" "js/min/"'
+      run: 'yes | cp -a "js/dev/." "js/min/"'
     - name: Minify Core
       run: uglifyjs -c -o "js/min/core.js" "js/dev/core.js"
     - name: Minify Index
