@@ -21,7 +21,7 @@ jobs:
 #   - name: Install tree
 #     run: sudo apt -y install tree
     - name: Show all directories
-      run: dir -a ../
+      run: 'dir -a ../'
       working-directory: js
     - name: Copy for fallback
       run: 'yes | cp -a "js/dev/." "js/min/"'
