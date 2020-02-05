@@ -18,11 +18,10 @@ jobs:
       timeout-minutes: 1
     - name: Install UglifyJS-ES
       run: npm install uglify-es -g
-#   - name: Install tree
-#     run: sudo apt -y install tree
+    - name: Get all files
+      uses: actions/checkout@v1
     - name: Show all directories
       run: 'dir -a ../'
-      working-directory: js
     - name: Copy for fallback
       run: 'yes | cp -a "js/dev/." "js/min/"'
     - name: Minify Core
@@ -37,3 +36,15 @@ jobs:
       run: uglifyjs -c -o "js/min/mediaSearchPack.js" "js/dev/mediaSearchPack.js"
     - name: Minify Recovery
       run: uglifyjs -c -o "js/min/recovery.js" "js/dev/recovery.js"
+    - name: Commit files
+      run: |
+        echo ${{ github.ref }}
+        git add .
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git commit -m "ci: Automated build push" -a | exit 0
+    - name: Push changes
+      if: github.ref == 'refs/heads/master'
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
