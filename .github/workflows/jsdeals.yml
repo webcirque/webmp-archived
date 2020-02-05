@@ -18,10 +18,10 @@ jobs:
       timeout-minutes: 1
     - name: Install UglifyJS-ES
       run: npm install uglify-es -g
-    - name: Install tree
-      run: sudo apt install tree
+#   - name: Install tree
+#     run: sudo apt -y install tree
     - name: Show all directories
-      run: tree
+      run: dir -a
     - name: Copy for fallback
       run: 'yes | cp -a "js/dev/." "js/min/"'
     - name: Minify Core
