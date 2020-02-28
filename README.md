@@ -42,4 +42,4 @@ Project page at [our website](https://webcirque.github.io/pwcq-pages/project/web
 | 0.28 | 0.28.0.14(20190203) | Syrup |  |
 | 0.28.0.15(20190309) | 0.28.0.16(20190330) | Sugarcube | Last versions before archiving as [WebMP Classic](https://github.com/webcirque/webmp-old). |
 | 1.0 | 1.0.6 | Whirl Ascention |  |
-| 1.0.7 | ~ | Glassy Lite |  |
+| 1.0.7 | ~ | Glassy Lite | Development of WebMP was passed from @[SkyFuInMC](https://github.com/SkyFuInMC) to @[Chdkfd](https://github.com/Chdkfd). |
