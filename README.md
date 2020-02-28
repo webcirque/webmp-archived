@@ -18,7 +18,7 @@ Please post bugs and suggestions here: [GitHub Issues](https://github.com/webcir
 
 ## Supported environments
 
-Can run on Windows XP/Vista/7/8/8.1/10, Android 6.0+, Ubuntu 16+ and other OS.
+Can run on Windows XP/Vista/7/8/8.1/10, Android 6.0+, Ubuntu 16+ and other OSs. Huawei Harmony would not be considered to support.
 
 Works best on environments with Chromium 59+ or Firefox 65+.
 
