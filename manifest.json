@@ -24,4 +24,5 @@
 	"optional_permissions": [
 		"cookies", "tabCapture", "desktopCapture", "downloads"
 	],
+	"incognito": "split"
 }
