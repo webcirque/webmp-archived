@@ -33,11 +33,13 @@ Project page at [our website](https://webcirque.github.io/pwcq-pages/project/web
 <!--Get FLV [https://api.bilibili.com/x/player/playurl?avid=58451592&cid=101951691&qn=64&type=&otype=json]-->
 
 ## Version names
-Start version | End version | Name | Description
-1 | 17 | *None* | Still named **MWASH Player** back then.
-18 | 26 | *Debug Release* | 
-0.27 | 0.27.5 | Clocktick | 
-0.28 | 0.28.0.14(20190203) | Syrup | 
-0.28.0.15(20190309) | 0.28.0.16(20190330) | Sugarcube | 
-1.0 | 1.0.6 | Whirl Ascention | 
-1.0.7 | ~ | Glassy Lite | 
+
+| Start version | End version | Name | Description |
+| --- | --- | --- | --- |
+| 0.1 | 0.17 | *None* | Still named **MWASH Player** back then. |
+| 0.18 | 0.26 | *Debug Release* | Renamed to **Webcirque Web Player** at some point. |
+| 0.27 | 0.27.5 | Clocktick |  |
+| 0.28 | 0.28.0.14(20190203) | Syrup |  |
+| 0.28.0.15(20190309) | 0.28.0.16(20190330) | Sugarcube | Last versions before archiving as [WebMP Classic](https://github.com/webcirque/webmp-old). |
+| 1.0 | 1.0.6 | Whirl Ascention |  |
+| 1.0.7 | ~ | Glassy Lite |  |
