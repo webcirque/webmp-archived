@@ -38,8 +38,8 @@ Project page at [our website](https://webcirque.github.io/pwcq-pages/project/web
 | --- | --- | --- | --- |
 | 0.1 | 0.17 | *None* | Still named **MWASH Player** back then. |
 | 0.18 | 0.26 | *Debug Release* | Renamed to **Webcirque Web Player** at some point. |
-| 0.27 | 0.27.5 | Clocktick |  |
-| 0.28 | 0.28.0.14(20190203) | Syrup |  |
-| 0.28.0.15(20190309) | 0.28.0.16(20190330) | Sugarcube | Last versions before archiving as [WebMP Classic](https://github.com/webcirque/webmp-old). |
+| 0.27 | 0.27​.5 | Clocktick |  |
+| 0.28 | 0.28​​.0.14​(2019​0203) | Syrup |  |
+| 0.28​.0.15​(2019​0309) | 0.28​.0.16​(2019​0330) | Sugarcube | Last versions before archiving as [WebMP Classic](https://github.com/webcirque/webmp-old). |
 | 1.0 | 1.0.6 | Whirl Ascention |  |
 | 1.0.7 | ~ | Glassy Lite | Development of WebMP was passed from @[SkyFuInMC](https://github.com/SkyFuInMC) to @[Chdkfd](https://github.com/Chdkfd). |
