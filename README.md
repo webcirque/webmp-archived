@@ -2,9 +2,9 @@
 
 ![jsdeals](https://github.com/webcirque/webmp/workflows/jsdeals/badge.svg)
 
-Webcirque Web Media Player.
+Webcirque Web Media Player. Licensed under Apache 2.0 License.
 
-Licensed under Apache 2.0 License.
+**Warning**: This piece of software is still a work in progress (in alpha), and lots of features are not guaranteed to work.
 
 ## Run
 
@@ -29,16 +29,16 @@ PS: _Older Firefox versions seems not to support some features._
 ## Languages expected to support
 **PS: Bolded languages are expected to be put in more effort.**
 
-Name | Language Code | Native Name
---- | --- | ---
-**English** (United States) | en_US | English (United States)
-**English** (United Kingdom) | en_GB | English (United Kingdom)
-**Orthodox Chinese** (Chunghwa Taiwan) | zh_TW | 正體中文（中華台灣）
-Traditional Cantonese (Chunghwa Hongkong) | zh_HK | 繁體中文（中華香港）
-**Simplified Chinese** (Mainland China) | zh_CN | 简体中文（中华大陆）
-Japanese | ja | 日本語
-French | fr | Français
-Spanish | es | Español
+Name | Language Code | Native Name | Suppo​rted?
+--- | --- | --- | ---
+**English** (United States) | en_US | English (United States) | ✓
+**English** (United Kingdom) | en_GB | English (United Kingdom) | ✓
+**Orthodox Chinese** (Chunghwa Taiwan) | zh_TW | 正體中文（中華台灣） | ✓
+Traditional Cantonese (Chunghwa Hongkong) | zh_HK | 繁體中文（中華香港） | ✕
+**Simplified Chinese** (Mainland China) | zh_CN | 简体中文（中华大陆） | ✓
+Japanese | ja | 日本語 | ✕
+French | fr | Français | ✕
+Spanish | es | Español | ✕
 
 ## Project page
 
