@@ -33,7 +33,7 @@ Name | Language Code | Native Name | Suppo​rted?
 --- | --- | --- | ---
 **English** (United States) | en_US | English (United States) | ✓
 **English** (United Kingdom) | en_GB | English (United Kingdom) | ✓
-**Orthodox Chinese** (Chunghwa Taiwan) | zh_TW | 正體中文（台灣） | ✓
+**Orthodox Chinese** (Chunghwa Taiwan) | zh_TW | 正體中文（臺灣） | ✓
 Traditional Cantonese (Chunghwa Hongkong) | zh_HK | 繁體中文（香港） | ✕
 **Simplified Chinese** (Mainland China) | zh_CN | 简体中文（大陆） | ✓
 Japanese | ja | 日本語 | ✕
