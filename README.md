@@ -4,7 +4,7 @@
 
 Webcirque Web Media Player. Licensed under Apache 2.0 License.
 
-**Warning**: This piece of software is still a work in progress (in alpha), and lots of features are not guaranteed to work.
+**Warning**: This piece of software is still a work in progress (in beta), and lots of features are not guaranteed to work.
 
 ## Run
 
@@ -48,12 +48,12 @@ Project page at [our website](https://webcirque.github.io/pwcq-pages/project/web
 
 ## Version names
 
-| Start version | End version | Name | Description |
-| --- | --- | --- | --- |
-| 0.1 | 0.17 | *None* | Launched by @[SkyFuInMC](https://github.com/SkyFuInMC). Still named **MWASH Player** back then. |
-| 0.18 | 0.26 | *Debug Release* | Renamed to **Webcirque Web Player** at some point. |
-| 0.27 | 0.27​.5 | Clocktick |  | @[Chdkfd](https://github.com/Chdkfd) joined development as UI designer and advisor.
-| 0.28 | 0.28​​.0.14​(2019​0203) | Syrup |  |
-| 0.28​.0.15​(2019​0309) | 0.28​.0.16​(2019​0330) | Sugarcube | Last versions before archiving as [WebMP Classic](https://github.com/webcirque/webmp-old). |
-| 1.0 | 1.0.6 | Whirl Ascention |  |
-| 1.0.7 | ~ | Glassy Lite | Main development of WebMP was passed from @[SkyFuInMC](https://github.com/SkyFuInMC) to @[Chdkfd](https://github.com/Chdkfd). |
+| Cycle | Start version | End version | Name | Description |
+| --- | --- | --- | --- | --- |
+| ALPHA | 0.1 | 0.17 | *None* | Launched by @[SkyFuInMC](https://github.com/SkyFuInMC). Still named **MWASH Player** back then. |
+| ALPHA | 0.18 | 0.26 | *Debug Release* | Renamed to **Webcirque Web Player** at some point. |
+| ALPHA | 0.27 | 0.27​.5 | Clocktick |  | @[Chdkfd](https://github.com/Chdkfd) joined development as UI designer and advisor.
+| ALPHA | 0.28 | 0.28​​.0.14​(2019​0203) | Syrup |  |
+| ALPHA | 0.28​.0.15​(2019​0309) | 0.28​.0.16​(2019​0330) | Sugarcube | Last versions before archiving as [WebMP Classic](https://github.com/webcirque/webmp-old). |
+| BETA | 1.0 | 1.0.6 | Whirl Ascention |  |
+| BETA | 1.0.7 | ~ | Glassy Lite | Main development of WebMP was passed from @[SkyFuInMC](https://github.com/SkyFuInMC) to @[Chdkfd](https://github.com/Chdkfd). |
