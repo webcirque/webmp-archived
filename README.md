@@ -6,6 +6,8 @@ Webcirque Web Media Player. Licensed under Apache 2.0 License.
 
 **Warning**: This piece of software is still a work in progress (in beta), and lots of features are not guaranteed to work.
 
+If you are not sure how to use this player, you can check the [manual](https://github.com/webcirque/webmp/wiki).
+
 ## Run
 
 Download latest build [1.0.7.10(**Glassy Lite**)](https://webcirque.github.io/pwcq-pages/projects/webmp/builds/1.0.7.10.zip) on our website (_Recommended_).
