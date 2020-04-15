@@ -12,9 +12,18 @@
     "homepage": "https://github.com/webcirque/webmp",
     "dependencies": {
         "jsmediatags": "^3.9.0",
+        "jschardet": "^2.1.1",
         "webcirque/websf": "^1.0.0",
         "flv.js": "^1.5.0",
         "ffmpeg.js": "^3.9.0",
-        "FFmpeg": "^2.8.0"
+        "FFmpeg/FFmpeg": "^2.8.0",
+        "crypto-js": "^3.1.2",
+        "unlock-music": "^1.4.1",
+        "jsqr": "^1.2.0",
+        "three": "^0.115.0",
+        "jssha": "^3.1.0",
+        "gifshot": "^0.4.5",
+        "gif.js": "^0.2.0",
+        "mersennetwister": "^0.2.3"
     }
 }
