@@ -18,12 +18,15 @@
         "ffmpeg.js": "^3.9.0",
         "FFmpeg/FFmpeg": "^2.8.0",
         "crypto-js": "^3.1.2",
-        "unlock-music": "^1.4.1",
+        "ix64/unlock-music": "^1.4.1",
         "jsqr": "^1.2.0",
         "three": "^0.115.0",
         "jssha": "^3.1.0",
         "gifshot": "^0.4.5",
         "gif.js": "^0.2.0",
-        "mersennetwister": "^0.2.3"
+        "mersennetwister": "^0.2.3",
+        "mastroska-subtitles": "^2.0.3",
+        "parse-torrent": "^7.1.2",
+        "webtorrent": "^0.108.1"
     }
 }
