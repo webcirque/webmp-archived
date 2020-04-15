@@ -1,0 +1,13 @@
+{
+    "name": "webcirque/webmp",
+    "description": "Just enjoy your media.",
+    "version": "1.0.7.11",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/webcirque/webmp.git"
+    },
+    "keywords": ["mediaplayer", "player", "media"],
+    "author": "Project Webcirque",
+    "license": "Apache License 2.0",
+    "homepage": "https://github.com/webcirque/webmp"
+}
