@@ -11,10 +11,10 @@
     "license": "Apache License 2.0",
     "homepage": "https://github.com/webcirque/webmp",
     "dependencies": {
-        "aadsm/jsmediatags": "^3.9.0",
+        "jsmediatags": "^3.9.0",
         "webcirque/websf": "^1.0.0",
-        "bilibili/flv.js": "^1.5.0",
-        "Kagami/ffmpeg.js": "^3.9.0",
-        "FFmpeg/FFmpeg": "^2.8.0"
+        "flv.js": "^1.5.0",
+        "ffmpeg.js": "^3.9.0",
+        "FFmpeg": "^2.8.0"
     }
 }
