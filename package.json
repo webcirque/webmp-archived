@@ -9,10 +9,12 @@
     "keywords": ["mediaplayer", "player", "media"],
     "author": "Project Webcirque",
     "license": "Apache License 2.0",
-    "homepage": "https://github.com/webcirque/webmp"
+    "homepage": "https://github.com/webcirque/webmp",
     "dependencies": {
         "aadsm/jsmediatags": "^3.9.0",
-        "webcirque/websf": "^1.0",
-        "bilibili/flv.js": "^1.5.0"
+        "webcirque/websf": "^1.0.0",
+        "bilibili/flv.js": "^1.5.0",
+        "Kagami/ffmpeg.js": "^3.9.0",
+        "FFmpeg/FFmpeg": "^2.8.0"
     }
 }
